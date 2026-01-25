@@ -42,24 +42,6 @@ func NewAnt(id int, role Role, x, y int, colonyID string) *Ant {
 	}
 }
 
-// GetAntIcon returns the symbol used to display this ant
-func (a *Ant) GetAntIcon() rune {
-	switch a.Role {
-	case Queen:
-		return '♛'
-	case Soldier:
-		return '⚔'
-	case Worker:
-		return '●'
-	case Nurse:
-		return '○'
-	case Larvae:
-		return '◦'
-	default:
-		return '●'
-	}
-}
-
 // AntInterface defines common behavior all ant types must implement
 type AntInterface interface {
 	GetAnt() *Ant     // Returns the default Ant

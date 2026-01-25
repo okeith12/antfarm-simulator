@@ -28,7 +28,7 @@ func main() {
 
 	// Create world
 	width, height := screen.Size()
-	world := types.NewWorld(width, height-10) // Reserve space for stats and controls
+	world := types.NewWorld(width, height-5) // Reserve space for stats and controls
 
 	// Create initial colony
 	queenX, queenY := width/4, height/3

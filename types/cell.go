@@ -73,13 +73,6 @@ func (c *Cell) GetCellIcon() rune {
 		return '🌱' // Just grass
 	}
 
-	if c.IsTunnel {
-		if c.Occupant != nil {
-			return '🐜' // Will handle ant rendering separately
-		}
-		return ' '
-	}
-
 	// soil textures
 	switch c.Soil {
 	case Sand:

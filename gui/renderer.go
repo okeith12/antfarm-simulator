@@ -31,7 +31,7 @@ func NewRenderer(screen tcell.Screen) *Renderer {
 func (r *Renderer) Render(world *types.World) {
 	r.screen.Clear()
 
-	// Draw queen chambers first (background layer)
+	// Draw queen chambers first (background layer) --- FIX IT
 	for _, colony := range world.Colonies {
 		if colony.Queen != nil {
 			qx, qy := colony.Queen.Position.X, colony.Queen.Position.Y
@@ -74,9 +74,9 @@ func (r *Renderer) Render(world *types.World) {
 					}
 				}
 
-				// Ants in tunnels have a terminal-style background
+				// Ants in tunnels have a default background
 				if cell.IsTunnel {
-					bgColor = Tunnel
+					bgColor = tcell.ColorDefault
 				} else {
 					bgColor = cell.GetColor()
 				}
@@ -87,8 +87,8 @@ func (r *Renderer) Render(world *types.World) {
 
 				// Tunnels have black background with grey/white foreground
 				if cell.IsTunnel {
-					bgColor = tcell.ColorBlack
-					fgColor = tcell.ColorWhite
+					bgColor = tcell.ColorDefault
+					fgColor = tcell.ColorBlack
 				} else {
 					// Soil cells: foreground and background same color for solid blocks
 					bgColor = tcell.ColorBlack
