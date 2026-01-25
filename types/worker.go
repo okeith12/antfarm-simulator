@@ -6,10 +6,13 @@ package types
 // Worker represents a laboring ant that digs and forages
 type WorkerAnt struct {
 	*Ant
-	CarryingFood   bool      // Is this worker carrying food?
-	FoodAmount     int       // How much food is being carried
-	DiggingPower   int       // How fast this worker digs (1-10)
-	TargetPosition *Position // Where the worker is trying to go
+	CarryingFood     bool      // Is this worker carrying food?
+	FoodAmount       int       // How much food is being carried
+	DiggingPower     int       // How fast this worker digs (1-10)
+	TargetPosition   *Position // Where the worker is trying to go
+	CurrentDirection int       // Current movement direction
+	MovesInDirection int
+	MovesMade        int
 }
 
 // NewWorker creates a new worker ant at the specified position
@@ -18,11 +21,14 @@ func NewWorker(id int, x, y int, colonyID string) *WorkerAnt {
 	ant.Health = 100
 
 	return &WorkerAnt{
-		Ant:            ant,
-		CarryingFood:   false,
-		FoodAmount:     0,
-		DiggingPower:   1,
-		TargetPosition: nil,
+		Ant:              ant,
+		CarryingFood:     false,
+		FoodAmount:       0,
+		DiggingPower:     1,
+		TargetPosition:   nil,
+		CurrentDirection: 0,
+		MovesInDirection: 0,
+		MovesMade:        0,
 	}
 }
 

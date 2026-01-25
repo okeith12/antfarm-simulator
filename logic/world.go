@@ -3,7 +3,6 @@ package logic
 import (
 	"antfarm/types"
 	"antfarm/util"
-	"math/rand"
 )
 
 // world.go - Main simulation update logic
@@ -36,7 +35,8 @@ func updateColony(world *types.World, colony *types.Colony) {
 
 	// Queen lays 1-5 eggs periodically (not on tick 0)
 	if world.Ticks > 0 && world.Ticks%eggLayingInterval == 0 && colony.Food >= 10 {
-		eggsToLay := rand.Intn(5) + 1 // Random 1-5 eggs
+		// eggsToLay := rand.Intn(5) + 1 // Random 1-5 eggs
+		eggsToLay := 1
 
 		// Only lay as many eggs as we can afford
 		for i := 0; i < eggsToLay && colony.Food >= 10; i++ {
