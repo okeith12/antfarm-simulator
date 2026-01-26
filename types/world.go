@@ -5,7 +5,7 @@ import "math/rand"
 // world.go - Defines the game world (the entire ant farm environment)
 // The world is a 2D grid of cells containing terrain, tunnels, and ants
 
-// World represents the entire simulation environment
+// World represents the entire  environment
 // Contains the grid of cells, all colonies, and tracks simulation time
 type World struct {
 	Width    int       // Width of the world

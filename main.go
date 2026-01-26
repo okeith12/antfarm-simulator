@@ -12,11 +12,11 @@ import (
 
 const (
 	simulationUpdatesPerSecond = 1  // How fast ants move/act (1 = once per second)
-	renderFPS                  = 30 // How fast screen refreshes (30 FPS)
+	renderFPS                  = 30 // Frames per seconnnddd (30 FPS)
 )
 
 func main() {
-	// Initialize tcell screen
+	// Initialize screen
 	screen, err := tcell.NewScreen()
 	if err != nil {
 		log.Fatalf("Failed to create screen: %v", err)
@@ -33,6 +33,7 @@ func main() {
 	// Create initial colony
 	queenX, queenY := width/4, height/3
 	colony := types.NewColony("Red", queenX, queenY, tcell.ColorRed)
+
 	world.AddColony(colony)
 
 	// Create renderer
@@ -48,7 +49,7 @@ func main() {
 	needsRender := true // Flag to track if we need to redraw
 
 	for running {
-		// Check for input events immediately (no lag)
+		// Check for input events immediately
 		for screen.HasPendingEvent() {
 			ev := screen.PollEvent()
 			switch ev := ev.(type) {
@@ -58,7 +59,7 @@ func main() {
 				}
 				if ev.Rune() == 'l' || ev.Rune() == 'L' {
 					renderer.ToggleLog()
-					needsRender = true // Force redraw when toggling log
+					needsRender = true
 				}
 			case *tcell.EventResize:
 				screen.Sync()
@@ -68,19 +69,19 @@ func main() {
 
 		select {
 		case <-simulationTicker.C:
-			// Update world state (slow - controlled by simulationUpdatesPerSecond)
+			// Update world state (controlled by simulationUpdatesPerSecond)
 			logic.UpdateWorld(world)
 			needsRender = true
 
 		case <-renderTicker.C:
-			// Render frequently for smooth visuals and responsive UI
+			// Render frequently for better visuals and responsive UI
 			if needsRender {
 				renderer.Render(world)
 				needsRender = false
 			}
 
 		default:
-			// Small sleep to prevent busy-waiting and CPU spinning
+			// Small sleep to prevent busy-waiting and CPU running
 			time.Sleep(10 * time.Millisecond)
 		}
 	}

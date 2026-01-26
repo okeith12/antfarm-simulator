@@ -142,21 +142,6 @@ func (wp *WorkerPathfinder) BringFoodToQueen(world *types.World, colony *types.C
 		directions = append(directions, [2]int{0, -1}) // Up
 	}
 
-	// todo: comment out
-	// // Add diagonal if both X and Y need to change
-	// if curX != target.X && curY != target.Y {
-	// 	dx := 1
-	// 	if curX > target.X {
-	// 		dx = -1
-	// 	}
-	// 	dy := 1
-	// 	if curY > target.Y {
-	// 		dy = -1
-	// 	}
-	// 	// Insert diagonal at the front
-	// 	directions = append([][2]int{{dx, dy}}, directions...)
-	// }
-
 	// Add perpendicular directions for going around obstacles
 	if curX == target.X {
 		// On same X, add left/right for going around

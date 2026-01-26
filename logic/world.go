@@ -3,6 +3,8 @@ package logic
 import (
 	"antfarm/types"
 	"antfarm/util"
+
+	"math/rand"
 )
 
 // world.go - Main simulation update logic
@@ -19,7 +21,7 @@ func UpdateWorld(world *types.World) {
 	}
 }
 
-// Timing constants - adjust these to change simulation speed
+// Timing constants
 var (
 	eggLayingInterval = 50 // Queen lays eggs every 50 ticks
 	eggHatchTime      = 30 // Eggs become larvae after 30 ticks
@@ -33,10 +35,9 @@ func updateColony(world *types.World, colony *types.Colony) {
 		colony.Queen.CurrentAction = "resting"
 	}
 
-	// Queen lays 1-5 eggs periodically (not on tick 0)
+	// Queen lays 1-5 eggs periodically
 	if world.Ticks > 0 && world.Ticks%eggLayingInterval == 0 && colony.Food >= 10 {
-		// eggsToLay := rand.Intn(5) + 1 // Random 1-5 eggs
-		eggsToLay := 1
+		eggsToLay := rand.Intn(5) + 1 // Random 1-5 eggs
 
 		// Only lay as many eggs as we can afford
 		for i := 0; i < eggsToLay && colony.Food >= 10; i++ {
