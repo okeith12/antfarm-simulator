@@ -91,8 +91,8 @@ func CanDigTo(world *types.World, x, y int) bool {
 	return !cell.IsTunnel && cell.Soil != types.Rock
 }
 
-// MoveAnt relocates an ant from its current position to a new position
-func MoveAnt(world *types.World, ant types.AntInterface, newX, newY int) {
+// Move relocates an ant from its current position to a new position
+func Move(world *types.World, ant types.AntInterface, newX, newY int) {
 	baseAnt := ant.GetAnt()
 
 	// Clear old position
@@ -119,7 +119,7 @@ func DigAndMove(world *types.World, ant types.AntInterface, newX, newY int) bool
 	}
 	if !cell.IsTunnel && cell.Soil != types.Rock {
 		cell.IsTunnel = true
-		MoveAnt(world, ant, newX, newY)
+		Move(world, ant, newX, newY)
 		return true
 	}
 	return false

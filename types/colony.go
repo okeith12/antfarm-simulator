@@ -44,45 +44,6 @@ func NewColony(name string, queenX, queenY int, color tcell.Color) *Colony {
 	}
 }
 
-// SpawnWorker creates a new worker ant at the given position
-func (c *Colony) SpawnWorker(x, y int) *WorkerAnt {
-	worker := NewWorker(c.NextAntID, x, y, c.Name)
-	c.NextAntID++
-	c.Workers = append(c.Workers, worker)
-	return worker
-}
-
-// SpawnWorkerWithID creates a new worker ant with a specific ID (used when larvae becomes worker)
-func (c *Colony) SpawnWorkerWithID(id int, x, y int) *WorkerAnt {
-	worker := NewWorker(id, x, y, c.Name)
-	c.Workers = append(c.Workers, worker)
-	return worker
-}
-
-// SpawnSoldier creates a new soldier ant at the given position
-func (c *Colony) SpawnSoldier(x, y int) *SoldierAnt {
-	soldier := NewSoldier(c.NextAntID, x, y, c.Name)
-	c.NextAntID++
-	c.Soldiers = append(c.Soldiers, soldier)
-	return soldier
-}
-
-// SpawnNurse creates a new nurse ant at the given position
-func (c *Colony) SpawnNurse(x, y int) *NurseAnt {
-	nurse := NewNurse(c.NextAntID, x, y, c.Name)
-	c.NextAntID++
-	c.Nurses = append(c.Nurses, nurse)
-	return nurse
-}
-
-// SpawnLarvae creates a new larvae at the given position
-func (c *Colony) SpawnLarvae(x, y int) *LarvaeAnt {
-	larvae := NewLarvae(c.NextAntID, x, y, c.Name)
-	c.NextAntID++
-	c.Larvae = append(c.Larvae, larvae)
-	return larvae
-}
-
 // GetAllAnts returns all ants in the colony as AntInterface slice
 // Useful for iteration when you need to process all ants regardless of role
 func (c *Colony) GetAllAnts() []AntInterface {
@@ -135,14 +96,4 @@ func (c *Colony) GetAntCount() int {
 	count += len(c.Soldiers)
 	count += len(c.Larvae)
 	return count
-}
-
-// RemoveLarvae removes a larvae from the colony's larvae list
-func (c *Colony) RemoveLarvae(larvae *LarvaeAnt) {
-	for i, l := range c.Larvae {
-		if l.ID == larvae.ID {
-			c.Larvae = append(c.Larvae[:i], c.Larvae[i+1:]...)
-			return
-		}
-	}
 }

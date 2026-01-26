@@ -24,7 +24,7 @@ func (wp *WorkerPathfinder) MoveRandomly(world *types.World, worker *types.Worke
 
 		// Try to continue in current direction
 		if CanMoveTo(world, newX, newY) {
-			MoveAnt(world, worker, newX, newY)
+			Move(world, worker, newX, newY)
 			worker.MovesMade++
 			return true
 		}
@@ -74,7 +74,7 @@ func (wp *WorkerPathfinder) pickNewDirection(world *types.World, worker *types.W
 			worker.MovesMade = 0
 
 			if CanMoveTo(world, newX, newY) {
-				MoveAnt(world, worker, newX, newY)
+				Move(world, worker, newX, newY)
 			} else {
 				DigAndMove(world, worker, newX, newY)
 			}
@@ -93,7 +93,7 @@ func (wp *WorkerPathfinder) pickNewDirection(world *types.World, worker *types.W
 			worker.CurrentDirection = int(oppositeDir)
 			worker.MovesInDirection = rand.Intn(4) + 3
 			worker.MovesMade = 0
-			MoveAnt(world, worker, newX, newY)
+			Move(world, worker, newX, newY)
 			worker.MovesMade++
 			return true
 		}
@@ -164,7 +164,7 @@ func (wp *WorkerPathfinder) BringFoodToQueen(world *types.World, colony *types.C
 
 		// Try to move
 		if CanMoveTo(world, newX, newY) {
-			MoveAnt(world, worker, newX, newY)
+			Move(world, worker, newX, newY)
 			return true
 		}
 
@@ -216,7 +216,7 @@ func (wp *WorkerPathfinder) MoveTowardTarget(world *types.World, worker *types.W
 		newY := worker.Position.Y + dir[1]
 
 		if CanMoveTo(world, newX, newY) {
-			MoveAnt(world, worker, newX, newY)
+			Move(world, worker, newX, newY)
 			return true
 		}
 	}

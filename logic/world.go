@@ -7,7 +7,7 @@ import (
 	"math/rand"
 )
 
-// world.go - Main simulation update logic
+// world.go - Main World simulation update logic
 // Handles per-tick updates for the entire world including all colonies
 
 // UpdateWorld advances the simulation by one tick
@@ -60,7 +60,7 @@ func updateColony(world *types.World, colony *types.Colony) {
 		// Find an empty cell near queen to spawn larvae
 		spawnX, spawnY := findEmptySpawnPosition(world, colony.QueenPosition)
 		if spawnX != -1 && spawnY != -1 {
-			larvae := colony.SpawnLarvae(spawnX, spawnY)
+			larvae := SpawnLarvae(colony, spawnX, spawnY)
 
 			// Place larvae in world
 			cell := world.GetCell(spawnX, spawnY)
@@ -77,14 +77,14 @@ func updateColony(world *types.World, colony *types.Colony) {
 
 		if larvae.HasNurseCare && larvae.Age >= larvaeGrowTime {
 			// Remove larvae from world
-			world.RemoveAnt(larvae)
+			RemoveAnt(world, larvae)
 
 			// Create new worker at same position, KEEPING THE SAME ID
-			worker := colony.SpawnWorkerWithID(larvae.ID, larvae.Position.X, larvae.Position.Y)
+			worker := SpawnWorkerWithID(colony, larvae.ID, larvae.Position.X, larvae.Position.Y)
 			worker.CurrentAction = "newly hatched"
 
 			// Place worker in world
-			world.PlaceAnt(worker)
+			PlaceAnt(world, worker)
 
 			// Clear the nurse's CurrentlyNursing if it was this larvae
 			if colony.HeadNurse != nil && colony.HeadNurse.CurrentlyNursing != nil &&
@@ -100,7 +100,7 @@ func updateColony(world *types.World, colony *types.Colony) {
 			}
 
 			// Remove from larvae list
-			colony.RemoveLarvae(larvae)
+			RemoveLarvae(colony, larvae)
 		}
 	}
 

@@ -86,7 +86,7 @@ func (np *NursePathfinder) MoveTowardTarget(world *types.World, colony *types.Co
 		}
 
 		if CanMoveTo(world, newX, newY) {
-			MoveAnt(world, nurse, newX, newY)
+			Move(world, nurse, newX, newY)
 			return true
 		}
 

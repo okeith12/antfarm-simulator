@@ -34,7 +34,7 @@ func main() {
 	queenX, queenY := width/4, height/3
 	colony := types.NewColony("Red", queenX, queenY, tcell.ColorRed)
 
-	world.AddColony(colony)
+	logic.AddColony(world, colony)
 
 	// Create renderer
 	renderer := gui.NewRenderer(screen)

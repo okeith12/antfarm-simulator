@@ -79,65 +79,6 @@ func generateSoilType(y, maxHeight int) Soil {
 	return Sand // Everything else is sand
 }
 
-// AddColony places a new colony in the world
-// Digs an initial chamber and places ALL ants (queen, nurses, etc.) in the world
-func (w *World) AddColony(colony *Colony) {
-	w.Colonies = append(w.Colonies, colony)
-
-	// Place queen in world
-	if colony.Queen != nil {
-		pos := colony.Queen.Position
-		if w.IsValidPosition(pos.X, pos.Y) {
-			cell := w.Grid[pos.Y][pos.X]
-			cell.IsTunnel = true
-			cell.Occupant = colony.Queen
-		}
-	}
-
-	// Place head nurse in world
-	if colony.HeadNurse != nil {
-		pos := colony.HeadNurse.Position
-		if w.IsValidPosition(pos.X, pos.Y) {
-			cell := w.Grid[pos.Y][pos.X]
-			cell.IsTunnel = true
-			cell.Occupant = colony.HeadNurse
-		}
-	}
-
-	// Place any other nurses
-	for _, nurse := range colony.Nurses {
-		pos := nurse.Position
-		if w.IsValidPosition(pos.X, pos.Y) {
-			cell := w.Grid[pos.Y][pos.X]
-			if cell.IsTunnel && cell.Occupant == nil {
-				cell.Occupant = nurse
-			}
-		}
-	}
-
-	// Place any existing workers
-	for _, worker := range colony.Workers {
-		pos := worker.Position
-		if w.IsValidPosition(pos.X, pos.Y) {
-			cell := w.Grid[pos.Y][pos.X]
-			if cell.IsTunnel && cell.Occupant == nil {
-				cell.Occupant = worker
-			}
-		}
-	}
-
-	// Place any existing soldiers
-	for _, soldier := range colony.Soldiers {
-		pos := soldier.Position
-		if w.IsValidPosition(pos.X, pos.Y) {
-			cell := w.Grid[pos.Y][pos.X]
-			if cell.IsTunnel && cell.Occupant == nil {
-				cell.Occupant = soldier
-			}
-		}
-	}
-}
-
 // IsValidPosition checks if the given coordinates are within world bounds
 func (w *World) IsValidPosition(x, y int) bool {
 	return x >= 0 && x < w.Width && y >= 0 && y < w.Height
@@ -150,53 +91,4 @@ func (w *World) GetCell(x, y int) *Cell {
 		return nil
 	}
 	return w.Grid[y][x]
-}
-
-// PlaceAnt places any ant type into the world at its current position
-func (w *World) PlaceAnt(ant AntInterface) bool {
-	pos := ant.GetAnt().Position
-	if !w.IsValidPosition(pos.X, pos.Y) {
-		return false
-	}
-
-	cell := w.Grid[pos.Y][pos.X]
-	if cell.IsTunnel && cell.Occupant == nil {
-		cell.Occupant = ant
-		return true
-	}
-	return false
-}
-
-// RemoveAnt removes an ant from its current position in the world
-func (w *World) RemoveAnt(ant AntInterface) {
-	pos := ant.GetAnt().Position
-	if w.IsValidPosition(pos.X, pos.Y) {
-		cell := w.Grid[pos.Y][pos.X]
-		if cell.Occupant != nil && cell.Occupant.GetAnt().ID == ant.GetAnt().ID {
-			cell.Occupant = nil
-		}
-	}
-}
-
-// MoveAnt moves an ant from its current position to a new position
-func (w *World) MoveAnt(ant AntInterface, newX, newY int) bool {
-	if !w.IsValidPosition(newX, newY) {
-		return false
-	}
-
-	newCell := w.GetCell(newX, newY)
-	if newCell == nil || !newCell.IsTunnel || newCell.Occupant != nil {
-		return false
-	}
-
-	// Remove from old position
-	w.RemoveAnt(ant)
-
-	// Update ant's position
-	ant.GetAnt().Position.X = newX
-	ant.GetAnt().Position.Y = newY
-
-	// Place in new position
-	newCell.Occupant = ant
-	return true
 }
