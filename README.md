@@ -1,9 +1,7 @@
 # AntFarm Simulator
 
-[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://golang.org/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Terminal-black?style=flat&logo=gnometerminal)](https://github.com/gdamore/tcell)
-[![Status](https://img.shields.io/badge/Status-v0%20Alpha-orange)](https://github.com)
+[![Version](https://img.shields.io/badge/Status-v0%20)](https://github.com)
 
 > **I am interested in becoming a digital Top G and this is just the start of my bionic ecosystem idea.** This ant simulator is v0 — the foundation for something much bigger. Next up: **Hardware-in-the-Loop (HWIL) ants** where physical MCUs run the ant brains while this simulator runs their world. Then comes the 3D printed ants. Join me on this journey from terminal ants to real-world bionic colonies. 
 
@@ -25,7 +23,7 @@ A terminal-based ant colony simulator written in Go. Watch your colony as the qu
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 Here is the antchitecture overview
 
