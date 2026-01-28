@@ -71,6 +71,11 @@ func updateColony(world *types.World, colony *types.Colony) {
 		}
 	}
 
+	// Age larvae first
+	for _, larvae := range colony.Larvae {
+		larvae.Age++
+	}
+
 	// Check larvae that have been nursed - they become workers
 	for i := len(colony.Larvae) - 1; i >= 0; i-- {
 		larvae := colony.Larvae[i]
@@ -124,9 +129,8 @@ func updateColony(world *types.World, colony *types.Colony) {
 		updateSoldier(world, soldier)
 	}
 
-	// Age all larvae and set their action based on whether a nurse is actively caring for them
+	// Set larvae action based on whether a nurse is actively caring for them
 	for _, larvae := range colony.Larvae {
-		larvae.Age++
 
 		// Check if this specific larvae is being nursed (nurse is adjacent)
 		isBeingNursed := false

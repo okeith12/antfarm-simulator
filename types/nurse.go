@@ -30,7 +30,7 @@ func (n *NurseAnt) GetAnt() *Ant {
 }
 
 // GetIcon returns the display icon for the nurse
-func (n *NurseAnt) GetAntIcon() rune {
+func (n *NurseAnt) GetIcon() rune {
 	return '○'
 }
 

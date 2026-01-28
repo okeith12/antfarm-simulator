@@ -44,7 +44,7 @@ func NewAnt(id int, role Role, x, y int, colonyID string) *Ant {
 
 // AntInterface defines common behavior all ant types must implement
 type AntInterface interface {
-	GetAnt() *Ant     // Returns the default Ant
-	GetAntIcon() rune // Returns the display icon for this ant
-	GetRole() Role    // Returns the ant's role
+	GetAnt() *Ant  // Returns the default Ant
+	GetIcon() rune // Returns the display icon for this ant
+	GetRole() Role // Returns the ant's role
 }

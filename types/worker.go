@@ -38,7 +38,7 @@ func (w *WorkerAnt) GetAnt() *Ant {
 }
 
 // GetIcon returns the display icon for the worker
-func (w *WorkerAnt) GetAntIcon() rune {
+func (w *WorkerAnt) GetIcon() rune {
 	return '●'
 }
 

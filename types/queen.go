@@ -27,7 +27,7 @@ func (q *QueenAnt) GetAnt() *Ant {
 }
 
 // GetIcon returns the display icon for the queen
-func (q *QueenAnt) GetAntIcon() rune {
+func (q *QueenAnt) GetIcon() rune {
 	return '♛'
 }
 

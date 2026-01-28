@@ -63,7 +63,7 @@ func (r *Renderer) Render(world *types.World) {
 
 			if cell.Occupant != nil {
 				// There's an ant in this cell - draw the ant
-				ch = cell.Occupant.GetAntIcon()
+				ch = cell.Occupant.GetIcon()
 
 				// Find the ant's colony to get its color
 				for _, colony := range world.Colonies {

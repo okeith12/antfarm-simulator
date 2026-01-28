@@ -32,7 +32,7 @@ func (s *SoldierAnt) GetAnt() *Ant {
 }
 
 // GetIcon returns the display icon for the soldier
-func (s *SoldierAnt) GetAntIcon() rune {
+func (s *SoldierAnt) GetIcon() rune {
 	return '⚔'
 }
 

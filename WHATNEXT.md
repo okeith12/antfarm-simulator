@@ -8,8 +8,8 @@ This document tracks planned features, improvements, and the long-term vision fo
 
 Foundation work before adding new features. Get the basics solid.
 
-- [ ] Separate stats out of renderer.go into its own package
-- [ ] Move logic out of types folder into logic folder 
+- [X] Separate stats out of renderer.go into its own package
+- [X] Move logic out of types folder into logic folder 
 - [ ] Update controls to actually work (speed up, slow down, pause)
 - [ ] Add test files for existing code, boohooo, AI come in handy here :crossed-fingers:
 - [ ] Add GitHub Actions to create releases

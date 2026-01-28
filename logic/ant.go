@@ -23,7 +23,7 @@ func updateWorker(world *types.World, colony *types.Colony, worker *types.Worker
 }
 
 // updateSoldier performs one tick of behavior for a soldier ant
-func updateSoldier(world *types.World, soldier *types.SoldierAnt) {
+func updateSoldier(_ *types.World, soldier *types.SoldierAnt) {
 	soldier.Age++
 	// TODO: Implement soldier patrol/combat behavior
 	soldier.CurrentAction = "patrolling"

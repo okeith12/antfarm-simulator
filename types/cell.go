@@ -61,8 +61,8 @@ func (c *Cell) GetColor() tcell.Color {
 	}
 }
 
-// GetCellIcon returns the visual character to display for this cell
-func (c *Cell) GetCellIcon() rune {
+// GetIcon returns the visual character to display for this cell
+func (c *Cell) GetIcon() rune {
 	if c.Soil == Empty {
 		if c.Food > 0 {
 			return '🌾' // Grass with food

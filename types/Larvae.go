@@ -30,7 +30,7 @@ func (l *LarvaeAnt) GetAnt() *Ant {
 }
 
 // GetIcon returns the display icon for the larvae
-func (l *LarvaeAnt) GetAntIcon() rune {
+func (l *LarvaeAnt) GetIcon() rune {
 	return '◦'
 }
 
