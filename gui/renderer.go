@@ -81,7 +81,7 @@ func (r *Renderer) Render(world *types.World) {
 				}
 			} else {
 				// No ant - draw the terrain
-				ch = cell.GetCellIcon()
+				ch = cell.GetIcon()
 				fgColor = cell.GetColor()
 
 				// Tunnels have black background with grey/white foreground
