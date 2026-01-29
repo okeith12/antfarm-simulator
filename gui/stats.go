@@ -36,7 +36,7 @@ func (r *Renderer) renderStats(world *types.World) {
 	// Activity Log Header (always visible)
 	y++
 	logStyle := tcell.StyleDefault.Foreground(tcell.ColorDarkCyan).Background(tcell.ColorDefault)
-	logHeader := "Log"
+	var logHeader string
 	if r.logExpanded {
 		logHeader = "Log (Press L to collapse)"
 	} else {

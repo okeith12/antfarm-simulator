@@ -12,7 +12,7 @@ import (
 // mockScreen creates a simulation screen for testing.
 func mockScreen() tcell.SimulationScreen {
 	screen := tcell.NewSimulationScreen("")
-	screen.Init()
+	_ = screen.Init()
 	screen.SetSize(80, 24)
 	return screen
 }
