@@ -146,6 +146,7 @@ antfarm/
 │   └── nursepathfinder.go  # Nurse-specific: guard nursery, tend larvae
 │
 ├── gui/                    # Terminal rendering
+|   ├── antfarm.go          # Main entrypoint and orchestrator 
 │   ├── renderer.go         # Render(), ToggleLog()
 │   ├── stats.go            # renderStats(), renderActivityLog()
 │   ├── controls.go         # renderControls()
