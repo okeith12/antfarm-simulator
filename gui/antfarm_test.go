@@ -32,7 +32,11 @@ func mockAntfarm(screen tcell.SimulationScreen) *Antfarm {
 		screen:   screen,
 		world:    world,
 		renderer: renderer,
-		running:  false,
+		state: AntfarmState{
+			running:    false,
+			paused:     false,
+			speedIndex: defaultSpeedIndex,
+		},
 	}
 }
 
@@ -99,7 +103,7 @@ func TestAntfarmRunQuitsOnQ(t *testing.T) {
 func TestAntfarmHandleEventsToggleLog(t *testing.T) {
 	screen := mockScreen()
 	antfarm := mockAntfarm(screen)
-	antfarm.running = true
+	antfarm.state.running = true
 
 	initialLogState := antfarm.renderer.logExpanded
 
@@ -107,13 +111,76 @@ func TestAntfarmHandleEventsToggleLog(t *testing.T) {
 	screen.InjectKey(tcell.KeyRune, 'L', tcell.ModNone)
 
 	needsRender := false
-	antfarm.handleEvents(&needsRender)
+	speedChanged := false
+	antfarm.handleEvents(&needsRender, &speedChanged)
 
 	if antfarm.renderer.logExpanded == initialLogState {
 		t.Error("Log should have toggled")
 	}
 	if !needsRender {
 		t.Error("needsRender should be true after toggle")
+	}
+}
+
+func TestAntfarmPause(t *testing.T) {
+	screen := mockScreen()
+	antfarm := mockAntfarm(screen)
+	antfarm.state.running = true
+
+	if antfarm.state.paused {
+		t.Error("Should not be paused initially")
+	}
+
+	screen.InjectKey(tcell.KeyRune, 'P', tcell.ModNone)
+
+	needsRender := false
+	speedChanged := false
+	antfarm.handleEvents(&needsRender, &speedChanged)
+
+	if !antfarm.state.paused {
+		t.Error("Should be paused after P key")
+	}
+}
+
+func TestAntfarmSpeedUp(t *testing.T) {
+	screen := mockScreen()
+	antfarm := mockAntfarm(screen)
+	antfarm.state.running = true
+
+	initialSpeed := antfarm.GetSpeed()
+
+	screen.InjectKey(tcell.KeyRune, '+', tcell.ModNone)
+
+	needsRender := false
+	speedChanged := false
+	antfarm.handleEvents(&needsRender, &speedChanged)
+
+	if antfarm.GetSpeed() <= initialSpeed {
+		t.Error("Speed should have increased")
+	}
+	if !speedChanged {
+		t.Error("speedChanged should be true")
+	}
+}
+
+func TestAntfarmSlowDown(t *testing.T) {
+	screen := mockScreen()
+	antfarm := mockAntfarm(screen)
+	antfarm.state.running = true
+
+	initialSpeed := antfarm.GetSpeed()
+
+	screen.InjectKey(tcell.KeyRune, '-', tcell.ModNone)
+
+	needsRender := false
+	speedChanged := false
+	antfarm.handleEvents(&needsRender, &speedChanged)
+
+	if antfarm.GetSpeed() >= initialSpeed {
+		t.Error("Speed should have decreased")
+	}
+	if !speedChanged {
+		t.Error("speedChanged should be true")
 	}
 }
 

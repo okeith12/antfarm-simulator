@@ -27,7 +27,7 @@ func NewRenderer(screen tcell.Screen) *Renderer {
 
 // Render draws the entire world state to the screen
 // Shows terrain, tunnels, ants, and colony statistics
-func (r *Renderer) Render(world *types.World) {
+func (r *Renderer) Render(world *types.World, paused bool, speed float64) {
 	r.screen.Clear()
 
 	// Draw queen chambers first (background layer) --- FIX IT
@@ -101,7 +101,7 @@ func (r *Renderer) Render(world *types.World) {
 
 	// Draw statistics at the bottom
 	r.renderStats(world)
-	r.renderControls(world)
+	r.renderControls(world, paused, speed)
 	r.screen.Show()
 }
 
