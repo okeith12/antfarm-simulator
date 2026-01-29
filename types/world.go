@@ -55,7 +55,8 @@ func NewWorld(width, height int) *World {
 
 // generateSoilType determines what soil type should appear at a given depth
 // Surface is sand, middle layers are dirt/clay, deep layers are rock
-func generateSoilType(y, maxHeight int) Soil {
+func generateSoilType(y, _ int) Soil {
+	// put back maxHeigt when using it
 	// depth := float64(y) / float64(maxHeight)
 
 	// if depth < 0.1 {

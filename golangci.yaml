@@ -1,0 +1,57 @@
+# golangci-lint configuration
+# Docs: https://golangci-lint.run/usage/configuration/
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    # Default linters
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Report suspicious constructs
+    - ineffassign   # Detect unused assignments
+    - staticcheck   # Static analysis checks
+    - unused        # Find unused code
+
+    # Additional linters
+    - gofmt         # Check formatting
+    - goimports     # Check import ordering
+    - misspell      # Find spelling mistakes
+    - unconvert     # Remove unnecessary conversions
+    - unparam       # Find unused function parameters
+    - gocritic      # Opinionated linter with many checks
+
+linters-settings:
+  errcheck:
+    # Don't require checking errors on Close() calls
+    exclude-functions:
+      - (*os.File).Close
+      - (io.Closer).Close
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+    disabled-checks:
+      - hugeParam    # Not worried about large params for now
+
+  goimports:
+    local-prefixes: antfarm
+
+issues:
+  # Don't skip any files
+  exclude-use-default: false
+  
+  # Max issues to report (0 = unlimited)
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+  exclude-rules:
+    # Ignore some linters in test files
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gocritic

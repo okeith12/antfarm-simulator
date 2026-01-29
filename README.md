@@ -1,7 +1,8 @@
 # AntFarm Simulator
 
 [![Platform](https://img.shields.io/badge/Platform-Terminal-black?style=flat&logo=gnometerminal)](https://github.com/gdamore/tcell)
-[![Version](https://img.shields.io/badge/Status-v0%20)](https://github.com)
+[![CI](https://github.com/okeith12/antfarm/actions/workflows/ci.yml/badge.svg)](https://github.com/okeith12/antfarm/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/github/v/tag/okeith12/antfarm?label=version)](https://github.com/okeith12/antfarm/releases)
 
 > **I am interested in becoming a digital Top G and this is just the start of my bionic ecosystem idea.** This ant simulator is v0 — the foundation for something much bigger. Next up: **Hardware-in-the-Loop (HWIL) ants** where physical MCUs run the ant brains while this simulator runs their world. Then comes the 3D printed ants. Join me on this journey from terminal ants to real-world bionic colonies. 
 
