@@ -18,11 +18,10 @@ jobs:
         with:
           go-version: '1.22'
 
-      - name: Run golangci-lint
+      - name: Lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
-          working-directory: ./antfarm
 
   test:
     name: Test
@@ -37,11 +36,9 @@ jobs:
           go-version: '1.22'
 
       - name: Run tests with coverage
-        working-directory: ./antfarm
         run: go test -coverprofile=coverage.out -covermode=atomic ./...
 
       - name: Check coverage threshold
-        working-directory: ./antfarm
         run: |
           COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
           echo "Total coverage: ${COVERAGE}%"
@@ -75,7 +72,6 @@ jobs:
   #         go-version: '1.22'
   #
   #     - name: Build binaries
-  #       working-directory: ./antfarm
   #       run: |
   #         GOOS=linux GOARCH=amd64 go build -o antfarm-linux-amd64
   #         GOOS=darwin GOARCH=amd64 go build -o antfarm-darwin-amd64
