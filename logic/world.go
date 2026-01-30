@@ -26,6 +26,7 @@ var (
 	eggLayingInterval = 50 // Queen lays eggs every 50 ticks
 	eggHatchTime      = 30 // Eggs become larvae after 30 ticks
 	larvaeGrowTime    = 50 // Larvae become workers after 50 ticks with nurse care
+	foodCost          = 5  // Cost of food
 )
 
 // updateColony handles all updates for a single colony
@@ -43,9 +44,9 @@ func updateColony(world *types.World, colony *types.Colony) {
 		eggsToLay := rand.Intn(5) + 1 // Random 1-5 eggs
 
 		// Only lay as many eggs as we can afford
-		for i := 0; i < eggsToLay && colony.Food >= 10; i++ {
+		for i := 0; i < eggsToLay && colony.Food >= foodCost; i++ {
 			colony.Eggs++
-			colony.Food -= 10
+			colony.Food -= foodCost
 			if colony.Queen != nil {
 				colony.Queen.TotalEggsLaid++
 			}

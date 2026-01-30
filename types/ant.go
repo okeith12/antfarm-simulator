@@ -7,8 +7,8 @@ package types
 const (
 	WorkerMaxTick  = 500   // Workers live shorter lives due to hard labor
 	SoldierMaxTick = 600   // Soldiers live a bit longer
-	NurseMaxTick   = 700   // Nurses live longer, less dangerous work
-	QueenMaxTick   = 20000 // Queens live much longer
+	NurseMaxTick   = 700   // Nurses live longer, babysitters
+	QueenMaxTick   = 20000 // Queens live basically forever until I make it the opp
 	LarvaeMaxTick  = 200   // Larvae must become workers before this or they die
 )
 
