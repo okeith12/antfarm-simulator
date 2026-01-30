@@ -13,7 +13,7 @@ type LarvaeAnt struct {
 
 // NewLarvae creates a new larvae at the specified position
 func NewLarvae(id int, x, y int, colonyID string) *LarvaeAnt {
-	ant := NewAnt(id, Larvae, x, y, colonyID)
+	ant := NewAnt(id, Larvae, x, y, colonyID, LarvaeMaxHealth, LarvaeMaxTick)
 	ant.Health = 50 // Larvae are fragile
 
 	return &LarvaeAnt{

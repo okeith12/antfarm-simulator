@@ -58,6 +58,20 @@ func TestSpawnSoldier(t *testing.T) {
 	}
 }
 
+func TestSpawnSoliderWithID(t *testing.T) {
+	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	initialNextID := colony.NextAntID
+
+	soldier := SpawnSoldierWithID(colony, 999, 15, 15)
+
+	if soldier.ID != 999 {
+		t.Errorf("Expected ID 999, got %d", soldier.ID)
+	}
+	if colony.NextAntID != initialNextID {
+		t.Error("NextAntID should not change with SpawnWorkerWithID")
+	}
+}
+
 func TestSpawnNurse(t *testing.T) {
 	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
 	initialID := colony.NextAntID
@@ -72,6 +86,19 @@ func TestSpawnNurse(t *testing.T) {
 	}
 	if len(colony.Nurses) != 1 {
 		t.Errorf("Expected 1 nurse, got %d", len(colony.Nurses))
+	}
+}
+func TestNurseWithID(t *testing.T) {
+	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	initialNextID := colony.NextAntID
+
+	nurse := SpawnNurseWithID(colony, 999, 15, 15)
+
+	if nurse.ID != 999 {
+		t.Errorf("Expected ID 999, got %d", nurse.ID)
+	}
+	if colony.NextAntID != initialNextID {
+		t.Error("NextAntID should not change with SpawnNurseWithID")
 	}
 }
 

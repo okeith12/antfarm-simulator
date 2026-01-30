@@ -171,6 +171,44 @@ func TestDigAndMove(t *testing.T) {
 	}
 }
 
+func TestDigAndMoveHealthCost(t *testing.T) {
+	world := types.NewWorld(20, 20)
+	world.Grid[5][5].IsTunnel = true
+
+	worker := types.NewWorker(1, 5, 5, "Red")
+	world.Grid[5][5].Occupant = worker
+	initialHealth := worker.Health
+
+	DigAndMove(world, worker, 6, 5)
+
+	if worker.Health != initialHealth-1 {
+		t.Errorf("Digging should cost 1 health. Initial: %d, After: %d, Expected: %d",
+			initialHealth, worker.Health, initialHealth-1)
+	}
+}
+
+func TestDigAndMoveMultipleDigsReduceHealth(t *testing.T) {
+	world := types.NewWorld(20, 20)
+
+	// Create a tunnel starting point
+	world.Grid[5][5].IsTunnel = true
+
+	worker := types.NewWorker(1, 5, 5, "Red")
+	world.Grid[5][5].Occupant = worker
+	initialHealth := worker.Health
+
+	// Dig 5 cells in a row
+	for i := 0; i < 5; i++ {
+		newX := 6 + i
+		DigAndMove(world, worker, newX, 5)
+	}
+
+	expectedHealth := initialHealth - 5
+	if worker.Health != expectedHealth {
+		t.Errorf("After 5 digs, health should be %d, got %d", expectedHealth, worker.Health)
+	}
+}
+
 func TestDigAndMoveFail(t *testing.T) {
 	world := types.NewWorld(20, 20)
 	world.Grid[5][5].IsTunnel = true

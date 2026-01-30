@@ -11,7 +11,7 @@ type QueenAnt struct {
 
 // NewQueen creates a new queen ant at the specified position
 func NewQueen(id int, x, y int, colonyID string) *QueenAnt {
-	ant := NewAnt(id, Queen, x, y, colonyID)
+	ant := NewAnt(id, Queen, x, y, colonyID, QueenMaxHealth, QueenMaxTick)
 	ant.Health = 200
 
 	return &QueenAnt{

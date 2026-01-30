@@ -3,7 +3,7 @@ package types
 import "testing"
 
 func TestGetActivityString(t *testing.T) {
-	ant := NewAnt(5, Worker, 10, 20, "Red")
+	ant := NewAnt(5, Worker, 10, 20, "Red", 10, 10)
 
 	result := ant.GetActivityString(1)
 	expected := "Red_Worker_Ant_5 is currently at (10,20) in World_1"
@@ -26,7 +26,7 @@ func TestGetActivityStringDifferentRoles(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		ant := NewAnt(1, tt.role, 0, 0, "Test")
+		ant := NewAnt(1, tt.role, 0, 0, "Test", 10, 10)
 		result := ant.GetActivityString(1)
 
 		if result == "" {

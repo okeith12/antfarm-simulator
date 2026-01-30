@@ -13,7 +13,7 @@ type NurseAnt struct {
 
 // NewNurse creates a new nurse ant at the specified position
 func NewNurse(id int, x, y int, colonyID string) *NurseAnt {
-	ant := NewAnt(id, Nurse, x, y, colonyID)
+	ant := NewAnt(id, Nurse, x, y, colonyID, NurseMaxHealth, NurseMaxTick)
 	ant.Health = 100
 
 	return &NurseAnt{

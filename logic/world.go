@@ -35,6 +35,9 @@ func updateColony(world *types.World, colony *types.Colony) {
 		colony.Queen.CurrentAction = "resting"
 	}
 
+	// Process deaths first (health <= 0 or old age)
+	processDeaths(world, colony)
+
 	// Queen lays 1-5 eggs periodically
 	if world.Ticks > 0 && world.Ticks%eggLayingInterval == 0 && colony.Food >= 10 {
 		eggsToLay := rand.Intn(5) + 1 // Random 1-5 eggs
@@ -84,12 +87,12 @@ func updateColony(world *types.World, colony *types.Colony) {
 			// Remove larvae from world
 			RemoveAnt(world, larvae)
 
-			// Create new worker at same position, KEEPING THE SAME ID
-			worker := SpawnWorkerWithID(colony, larvae.ID, larvae.Position.X, larvae.Position.Y)
-			worker.CurrentAction = "newly hatched"
+			// Determine what role this larvae becomes
+			// Rolls 1-100, then checks thresholds
+			newAnt := larvaeToAnt(colony, larvae, rand.Intn(100))
 
 			// Place worker in world
-			PlaceAnt(world, worker)
+			PlaceAnt(world, newAnt)
 
 			// Clear the nurse's CurrentlyNursing if it was this larvae
 			if colony.HeadNurse != nil && colony.HeadNurse.CurrentlyNursing != nil &&
@@ -189,4 +192,73 @@ func findEmptySpawnPosition(world *types.World, queenPos types.Position) (int, i
 	}
 
 	return -1, -1 // No empty position found
+}
+
+// processDeaths checks all ants for death conditions and removes dead ants
+// Ants die from: health <= 0 (exhaustion/damage) or age >= maxAge (old age)
+func processDeaths(world *types.World, colony *types.Colony) {
+	// Check queen death
+	if colony.Queen != nil && colony.Queen.IsDead() {
+		RemoveAnt(world, colony.Queen)
+		colony.Queen = nil
+		// TODO: Colony collapse when queen dies? (Phase 2)
+	}
+
+	// Check head nurse death
+	if colony.HeadNurse != nil && colony.HeadNurse.IsDead() {
+		RemoveAnt(world, colony.HeadNurse)
+		colony.HeadNurse = nil
+		// TODO: Promote a nurse to head nurse w new Queen
+	}
+
+	// Check other nurses - iterate backwards for safe removal
+	for i := len(colony.Nurses) - 1; i >= 0; i-- {
+		nurse := colony.Nurses[i]
+		if nurse.IsDead() {
+			// If this nurse was caring for a larvae, mark it as needing care again
+			if nurse.CurrentlyNursing != nil {
+				nurse.CurrentlyNursing.HasNurseCare = false
+			}
+			RemoveAnt(world, nurse)
+			RemoveNurse(colony, nurse)
+		}
+	}
+
+	// Check workers - iterate backwards for safe removal
+	for i := len(colony.Workers) - 1; i >= 0; i-- {
+		worker := colony.Workers[i]
+		if worker.IsDead() {
+			// If worker was carrying food, it's lost
+			RemoveAnt(world, worker)
+			RemoveWorker(colony, worker)
+		}
+	}
+
+	// Check soldiers - iterate backwards for safe removal
+	for i := len(colony.Soldiers) - 1; i >= 0; i-- {
+		soldier := colony.Soldiers[i]
+		if soldier.IsDead() {
+			RemoveAnt(world, soldier)
+			RemoveSoldier(colony, soldier)
+		}
+	}
+
+	// Check larvae - they die if not nursed before MaxAge
+	for i := len(colony.Larvae) - 1; i >= 0; i-- {
+		larvae := colony.Larvae[i]
+		if larvae.IsDead() {
+			// Clear any nurse that was targeting this larvae
+			if colony.HeadNurse != nil && colony.HeadNurse.CurrentlyNursing != nil &&
+				colony.HeadNurse.CurrentlyNursing.ID == larvae.ID {
+				colony.HeadNurse.CurrentlyNursing = nil
+			}
+			for _, nurse := range colony.Nurses {
+				if nurse.CurrentlyNursing != nil && nurse.CurrentlyNursing.ID == larvae.ID {
+					nurse.CurrentlyNursing = nil
+				}
+			}
+			RemoveAnt(world, larvae)
+			RemoveLarvae(colony, larvae)
+		}
+	}
 }

@@ -119,6 +119,9 @@ func DigAndMove(world *types.World, ant types.AntInterface, newX, newY int) bool
 	}
 	if !cell.IsTunnel && cell.Soil != types.Rock {
 		cell.IsTunnel = true
+		// Reduce health for each dig
+		baseAnt := ant.GetAnt()
+		baseAnt.Health--
 		Move(world, ant, newX, newY)
 		return true
 	}

@@ -14,7 +14,7 @@ type SoldierAnt struct {
 
 // NewSoldier creates a new soldier ant at the specified position
 func NewSoldier(id int, x, y int, colonyID string) *SoldierAnt {
-	ant := NewAnt(id, Soldier, x, y, colonyID)
+	ant := NewAnt(id, Soldier, x, y, colonyID, SoldierMaxHealth, SoldierMaxTick)
 	ant.Health = 150 // Soldiers have more health than workers
 
 	return &SoldierAnt{
