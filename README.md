@@ -115,7 +115,7 @@ Here is the antchitecture overview
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 antfarm/
@@ -128,18 +128,19 @@ antfarm/
 │   ├── cell.go             # Individual grid cells (soil, tunnel, food)
 │   ├── colony.go           # Colony struct
 │   ├── ant.go              # Base Ant + AntInterface
-│   ├── queen.go            # QueenAnt - lays eggs
-│   ├── nurse.go            # NurseAnt - tends larvae
-│   ├── worker.go           # WorkerAnt - digs, forages
-│   ├── solider.go          # SoldierAnt - defends (WIP)
-│   ├── larvae.go           # LarvaeAnt - baby ants
+│   ├── queen.go            # Queen Ant - lays eggs
+│   ├── nurse.go            # Nurse Ant - tends larvae
+│   ├── worker.go           # Worker Ant - digs, forages
+│   ├── solider.go          # Soldier Ant - defends (WIP)
+│   ├── larvae.go           # Larvae - baby ants
 │   └── log.go              # Activity logging helper
 │
-├── logic/                  # the "how"
-│   ├── world.go            # UpdateWorld(), updateColony(), egg/larvae lifecycle
-│   ├── ant.go              # Ant behavior dispatchers
-│   ├── world_colony.go    # AddColony(), PlaceAnt(), RemoveAnt(), MoveWorldAnt()
-│   └── colony_ant.go   # SpawnWorker(), SpawnNurse(), SpawnLarvae(), RemoveLarvae()
+├── simulation/             # the "how"
+│   ├── updateWorld.go      # UpdateWorld(), updateColony(), egg/larvae lifecycle
+│   ├── antsBehavior.go     # Ant behavior dispatchers
+│   ├── matureLarveToAnt.go # turn larvae into its desiginated ant
+│   ├── antPlacement.go     # AddColony(), PlaceAnt(), RemoveAnt(), MoveWorldAnt()
+│   └── spawn.go            # SpawnWorker(), SpawnNurse(), SpawnLarvae(), RemoveLarvae()
 │
 ├── pathfinder/             # Movement and navigation
 │   ├── pathfinder.go       # Shared utilities, directions, movement
