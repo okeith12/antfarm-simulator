@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-// ant.go - Defines how ants move and make decisions
+// antsBehavior.go - Defines how ants move and make decisions
 // Each ant role has different behavior patterns
 
 // Pathfinders - reusable instances

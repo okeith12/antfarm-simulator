@@ -2,7 +2,7 @@ package logic
 
 import "antfarm/types"
 
-//larvaeToAnt is a helper function to decide the next step in the lifecylce for the larvae
+//matureLarvaeToAnt is a helper function to decide the next step in the lifecylce for the larvae
 
 // Role spawn chances (out of 100)
 // Adjust these values to change the distribution of ant types
@@ -14,7 +14,7 @@ const (
 
 // larvaeToAnt creates the appropriate adult ant based on a random roll
 // roll should be 0-99, larvae provides ID and position
-func larvaeToAnt(colony *types.Colony, larvae *types.LarvaeAnt, roll int) types.AntInterface {
+func matureLarvaeToAnt(colony *types.Colony, larvae *types.LarvaeAnt, roll int) types.AntInterface {
 	var newAnt types.AntInterface
 
 	switch {

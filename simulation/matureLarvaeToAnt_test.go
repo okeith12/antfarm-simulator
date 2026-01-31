@@ -26,7 +26,7 @@ func TestLarvaeToAnt_RoleSelection(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ant := larvaeToAnt(colony, larvae, tt.roll)
+			ant := matureLarvaeToAnt(colony, larvae, tt.roll)
 
 			if ant == nil {
 				t.Fatalf("expected ant, got nil")

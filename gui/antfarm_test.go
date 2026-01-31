@@ -1,7 +1,7 @@
 package gui
 
 import (
-	"antfarm/logic"
+	logic "antfarm/simulation"
 	"antfarm/types"
 	"testing"
 	"time"

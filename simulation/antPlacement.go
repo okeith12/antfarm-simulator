@@ -4,7 +4,7 @@ import (
 	"antfarm/types"
 )
 
-// world_colony.go - World's Colony mutation logic
+// antPlacement.go - World's Colony mutation logic
 // Handles colony placement and ant positioning within the world
 
 // AddColony places a new colony in the world

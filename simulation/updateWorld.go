@@ -7,7 +7,7 @@ import (
 	"math/rand"
 )
 
-// world.go - Main World simulation update logic
+// updateWorld.go - Main World simulation update logic
 // Handles per-tick updates for the entire world including all colonies
 
 // UpdateWorld advances the simulation by one tick
@@ -90,7 +90,7 @@ func updateColony(world *types.World, colony *types.Colony) {
 
 			// Determine what role this larvae becomes
 			// Rolls 1-100, then checks thresholds
-			newAnt := larvaeToAnt(colony, larvae, rand.Intn(100))
+			newAnt := matureLarvaeToAnt(colony, larvae, rand.Intn(100))
 
 			// Place worker in world
 			PlaceAnt(world, newAnt)
