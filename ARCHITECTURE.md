@@ -1,259 +1,334 @@
 # AntFarm Architecture
 
-How the Go implementation is put together, and why it is shaped this way.
-
-Status: v0, terminal. Last updated 2026-08-05.
-
-Companion documents: `README.md` (what it is), `WHATNEXT.md` (where it is going),
-`LIFECYCLE-AUDIT.md` (known behavioural problems).
-
 ---
 
-## 1. The one rule
-
-**The simulation core knows nothing about the display.**
+## Package graph
 
 ```
-gui/  ────uses────>  simulation/  ────uses────>  pathfinder/  ───>  types/
-                                                                      ^
-                                                                      |
-                                              nothing here imports tcell
+                    ┌──────────────────────────────────┐
+                    │              gui/                │  tcell
+                    │  antfarm · renderer · stats      │  ONLY here
+                    │  controls · colors               │
+                    └───────────────┬──────────────────┘
+                                    │ reads
+                    ┌───────────────▼──────────────────┐
+                    │          simulation/             │  package logic
+                    │  updateWorld · antsBehavior      │
+                    │  antPlacement · spawn            │
+                    │  matureLarvaeToAnt               │
+                    └───────┬──────────────────┬───────┘
+                            │                  │
+              ┌─────────────▼──────┐   ┌───────▼────────┐
+              │    pathfinder/     │   │     util/      │
+              │  pathfinder        │   │  Abs           │
+              │  workerpathfinder  │   └────────────────┘
+              │  nursepathfinder   │
+              └─────────┬──────────┘
+                        │
+              ┌─────────▼──────────┐   ┌────────────────┐
+              │       types/       │──▶│      rng/      │
+              │  world · cell      │   │  xorshift32    │
+              │  colony · ant      │   └────────────────┘
+              │  queen · nurse     │
+              │  worker · soldier  │
+              │  larvae · log      │
+              └────────────────────┘
 ```
 
-The arrow never reverses. `types/`, `simulation/`, `pathfinder/`, `util/` and
-`rng/` contain no reference to tcell, to a terminal, or to any display concept.
-You can verify it in one command:
-
-```bash
-grep -rn "tcell" types simulation pathfinder util rng main.go   # returns nothing
-```
-
-This matters because of where the project is going. The terminal build is v0.
-The same simulation has to run on a microcontroller driving an SPI panel, where
-no terminal library exists. Anything the core knows about rendering is something
-that has to be torn out later.
-
-`gui/` is the only package allowed to import tcell, because rendering is its
-entire job.
-
----
-
-## 2. Packages
-
-| Package | Role | Depends on |
-|---|---|---|
-| `types/` | The nouns. World, Cell, Colony, and the five ant kinds. | `rng/` |
-| `simulation/` | The verbs. One tick of world update, spawning, behaviour, placement. | `types/`, `pathfinder/`, `util/` |
-| `pathfinder/` | Movement. Shared helpers plus per-role navigation. | `types/`, `util/` |
-| `gui/` | Terminal rendering, input, the game loop. | everything, plus tcell |
-| `rng/` | Deterministic xorshift32 generator. | nothing |
-| `util/` | `Abs()` for integers. | nothing |
-
-**A naming trap worth knowing.** The `simulation/` directory declares
-`package logic`, left over from a rename. Import it as:
-
-```go
-import logic "antfarm/simulation"
-```
-
----
-
-## 3. Data model
-
-### World
-
-```go
-type World struct {
-    Width, Height int
-    Cells         []Cell     // flat, row-major
-    Colonies      []*Colony
-    Ticks         int
-    Rng           *rng.Rng
-}
-```
-
-The grid is a **single flat slice**, not a slice of slices of pointers. The cell
-at `(x, y)` lives at `Cells[y*Width + x]`:
-
-```
-W = 5
-        x=0  1   2   3   4
- y=0  [  0   1   2   3   4 ]
- y=1  [  5   6   7   8   9 ]     Index(2,1) = 1*5 + 2 = 7
- y=2  [ 10  11  12  13  14 ]
-```
-
-Row-major, so stepping `x` moves one slot and stepping `y` moves a whole row.
-Two reasons for that order: the renderer scans along rows, so consecutive reads
-are contiguous in memory, and it is the 2D case of the firmware's 3D formula
-`(z*Height + y)*Width + x`, which keeps the port mechanical.
-
-`GetCell(x, y)` returns a pointer **into** the slice, so writes through it are
-visible to the next reader. It returns nil out of bounds.
-
-### Colony
-
-One reigning queen, one head nurse, and slices for every other role. Food is
-shared, held as scaled integers (see 5.1).
-
-```go
-type Colony struct {
-    Queen     *QueenAnt      // the reigning queen, nil if the colony has none
-    Queens    []*QueenAnt    // heirs in waiting
-    HeadNurse *NurseAnt
-    Nurses    []*NurseAnt
-    Workers   []*WorkerAnt
-    Soldiers  []*SoldierAnt
-    Larvae    []*LarvaeAnt
-    Food, Eggs, NextAntID int
-    QueenPosition Position
-}
-```
-
-Every ant embeds a base `Ant` and satisfies `AntInterface` (`GetAnt`, `GetIcon`,
-`GetRole`). A `Cell` holds one `Occupant`.
-
----
-
-## 4. One tick
-
-`logic.UpdateWorld(world)` increments `Ticks` and runs `updateColony` for each
-colony, in this order:
-
-```
-UpdateWorld
-   |
-   +-- Ticks++
-   |
-   +-- for each colony: updateColony
-            |
-            +-- queen action defaults to "resting"
-            +-- if the queen is Declining, she loses health
-            +-- processDeaths          (removals, then succession)
-            +-- queen lays one egg     (needs a queen, the interval, and food)
-            +-- one egg hatches into a larva
-            +-- larvae age
-            +-- nursed, grown larvae mature into adults
-            +-- update head nurse, nurses, workers, soldiers
-            +-- mark each larva as cared for or waiting
-```
-
-Deaths are processed first so the rest of the tick never operates on a corpse.
-
-Rendering is driven separately by `gui/`, which reads world state and never
-mutates it.
-
----
-
-## 5. Design decisions worth knowing
-
-### 5.1 Food is a scaled integer, never a float
-
-`types.FoodScale = 10`, so internally food is counted in tenths. One food unit
-displays as 0.1 food, and the stats bar divides by `FoodScale` on the way out.
-
-Floats are avoided deliberately. The firmware port has to produce bit-identical
-results from the same seed, and float arithmetic does not survive that: compilers
-reassociate under optimisation, x86 may use 80-bit internal precision where the
-target uses 32-bit, and fused multiply-add changes rounding. One differing bit
-compounds into an entirely different colony a thousand ticks later. Integers are
-exact on every platform.
-
-### 5.2 Randomness is injected and reproducible
-
-Nothing in the simulation calls `math/rand`. The generator is xorshift32, held on
-the World and passed in at construction:
-
-```go
-world := types.NewWorld(120, 35, rng.New(seed))
-```
-
-The terminal app seeds from the clock, so every run differs. Tests pass fixed
-seeds. Same seed, same colony, always.
-
-xorshift32 was chosen over Go's `math/rand` because it is ten lines and
-reimplements identically in C. `Rng.Below` uses plain modulo rather than
-rejection sampling for the same reason: rejection sampling consumes a variable
-number of draws and would desynchronise two implementations.
-
-### 5.3 Colour lives only in the display layer
-
-`gui/colors.go` holds the single mapping from simulation enums to tcell colours:
-`SoilColor(soil, isTunnel)` and `ColonyColor(c)`. A colony stores a
-`types.ColonyColor` enum, which is a palette slot, not a colour.
-
-On the firmware this file becomes an rgb565 lookup table. Nothing else changes.
-
-### 5.4 A colony can never go queenless
-
-This is a structural guarantee, not a balance tuning:
-
-- A queen does not age and is immortal
-- She only loses health once `Declining` is set
-- `Declining` is only set when an heir is born
-- Heirs do not age and cannot die while waiting
-
-So a queen is mortal only while an heir exists to replace her. When she dies the
-longest-waiting heir is crowned where she stands, the colony centre moves with
-her, and every other heir is demoted to worker or nurse, because a colony holds
-exactly one queen.
-
----
-
-## 6. Tuning
-
-Caste roll on maturity, `simulation/matureLarvaeToAnt.go`:
-
-| Roll | Becomes |
+| Zone | tcell |
 |---|---|
-| 0 | Queen (1%) |
-| 1-20 | Nurse (20%) |
-| 21-35 | Soldier (15%) |
-| 36-99 | Worker (64%) |
-
-Timing and cost, `simulation/updateWorld.go`:
-
-| Constant | Value | Meaning |
-|---|---|---|
-| `eggLayingInterval` | 50 | Ticks between eggs |
-| `eggHatchTime` | 30 | Ticks per hatch, one egg at a time |
-| `larvaeGrowTime` | 50 | Ticks of nursed growth before maturing |
-| `foodCost` | 1 | Food units per egg, so 0.1 food |
-| `layingThreshold` | 100 | Store needed to lay, so 10 food |
-| `queenDeclineInterval` | 30 | Ticks per health point once declining |
-
-Lifespans and health, `types/ant.go`:
-
-| Role | Max age | Health |
-|---|---|---|
-| Worker | 500 | 100 |
-| Soldier | 600 | 150 |
-| Nurse | 700 | 80 |
-| Queen | 20000, unused while immortal | 200 |
-| Larva | 200 | 50 |
-
----
-
-## 7. Testing
+| `gui/` | yes |
+| `types/` `simulation/` `pathfinder/` `util/` `rng/` | no |
 
 ```bash
-go test ./...     # 111 tests across 6 packages
+grep -rn "tcell" types simulation pathfinder util rng main.go   # empty
 ```
-
-Two properties are worth calling out because the port depends on them:
-
-- `rng` proves same seed produces the same sequence, that a zero seed does not
-  collapse xorshift32 to zeroes, and that `Shuffle` is deterministic.
-- `TestSameSeedProducesSameColony` runs 500 ticks twice on one seed and compares
-  full colony state.
-
-Everything is deterministic. A flaky test here means a real bug, not luck.
 
 ---
 
-## 8. Known problems
+## Data model
 
-`LIFECYCLE-AUDIT.md` has the detail. In short: foraging is a blind random walk,
-so workers spend most of their life wandering; the world's food is finite and
-never regenerates; and eggs hatch one per 30 ticks regardless of how many are
-waiting. These are known and accepted at v0.
+```
+World
+├── Width, Height   int
+├── Cells           []Cell        flat, row-major
+├── Colonies        []*Colony
+├── Ticks           int
+└── Rng             *rng.Rng
+
+Cell                              Colony
+├── Soil     Soil                 ├── Queen         *QueenAnt    reigning, 1 or nil
+├── IsTunnel bool                 ├── Queens        []*QueenAnt  heirs, frozen
+├── Occupant AntInterface         ├── HeadNurse     *NurseAnt
+└── Food     int                  ├── Nurses        []*NurseAnt
+                                  ├── Workers       []*WorkerAnt
+Ant  (embedded by all five)       ├── Soldiers      []*SoldierAnt
+├── ID, Role, Position            ├── Larvae        []*LarvaeAnt
+├── Health, MaxHealth             ├── Food, Eggs    int
+├── Age, MaxAge                   ├── NextAntID     int
+├── ColonyID                      ├── Color         ColonyColor
+└── CurrentAction                 └── QueenPosition Position
+```
+
+```
+AntInterface
+├── GetAnt()  *Ant
+├── GetIcon() rune
+└── GetRole() Role
+        ▲
+        ├── QueenAnt    ♛   + EggLayingCooldown, TotalEggsLaid, Declining
+        ├── NurseAnt    ○   + CurrentlyNursing, LarvaeNursed
+        ├── WorkerAnt   ●   + CarryingFood, FoodAmount, DiggingPower, direction
+        ├── SoldierAnt  ⚔
+        └── LarvaeAnt   ◦   + HasNurseCare, GrowthProgress
+```
+
+---
+
+## Grid memory layout
+
+```
+Cells []Cell            Index(x, y) = y*Width + x
+
+W = 5
+         x=0   1    2    3    4
+  y=0  [  0    1    2    3    4  ]
+  y=1  [  5    6    7    8    9  ]      Index(2,1) = 1*5+2 = 7
+  y=2  [ 10   11   12   13   14  ]
+
+  ├──── row 0 ────┼──── row 1 ────┼──── row 2 ────┤   contiguous
+```
+
+| | |
+|---|---|
+| 3D form | `(z*Height + y)*Width + x` |
+| `GetCell(x,y)` | `&Cells[Index(x,y)]`, nil out of bounds |
+| returns | pointer into the slice, not a copy |
+
+---
+
+## One tick
+
+```
+UpdateWorld(world)
+│
+├─ Ticks++
+│
+└─ for each colony ──▶ updateColony
+   │
+   ├─ 1. queen action := "resting"
+   │
+   ├─ 2. if Queen.Declining && Ticks % 30 == 0 ──▶ Queen.Health--
+   │
+   ├─ 3. processDeaths
+   │      ├─ queen dead? ──▶ crown Queens[0] ──▶ demote the rest
+   │      ├─ head nurse · nurses · workers · soldiers · larvae
+   │      └─ removals are backward-iterated
+   │
+   ├─ 4. Ticks % 50 == 0 && Queen != nil && Food >= 100 ──▶ Eggs++, Food -= 1
+   │
+   ├─ 5. Ticks % 30 == 0 && Eggs > 0 ──▶ Eggs--, spawn 1 larva near queen
+   │
+   ├─ 6. all larvae ──▶ Age++
+   │
+   ├─ 7. larvae with HasNurseCare && Age >= 50 ──▶ matureLarvaeToAnt
+   │
+   ├─ 8. head nurse ─┐
+   │    nurses ──────┤
+   │    workers ─────┼──▶ per-role behaviour
+   │    soldiers ────┘
+   │
+   └─ 9. larvae action := "getting care" | "waiting for care"
+```
+
+---
+
+## Render loop
+
+```
+gui.Antfarm.Run()
+│
+├─ renderTicker      30 FPS, fixed
+├─ simulationTicker  speedPresets[i] Hz
+│
+└─ loop
+   ├─ handleEvents ──▶ Q/ESC quit · L log · P pause · +/- speed
+   ├─ simulationTicker fires && !paused ──▶ logic.UpdateWorld
+   └─ renderTicker fires && needsRender ──▶ renderer.Render
+                                              ├─ terrain   SoilColor(Soil, IsTunnel)
+                                              ├─ ants      ColonyColor(Colony.Color)
+                                              ├─ stats bar
+                                              └─ activity log
+```
+
+Simulation writes. Render only reads.
+
+---
+
+## Ant lifecycle
+
+```
+   Food >= 100          Ticks%30            nursed
+   Ticks%50                │                Age>=50
+      │                    │                   │
+      ▼                    ▼                   ▼
+    Egg ──────────────▶ Larva ─────────────▶ roll 0-99
+   -1 food                 │                   │
+                           │             ┌─────┼─────┬────────┬────────┐
+                    Age>=200             │     │     │        │        │
+                           │             0    1-20  21-35   36-99      │
+                           ▼             │     │     │        │        │
+                         dead          Queen Nurse Soldier Worker      │
+                                         1%   20%    15%     64%       │
+                                                                       │
+   Age >= MaxAge  or  Health <= 0 ──────────────────────────────▶ dead
+```
+
+| Role | MaxAge | Health | Drain |
+|---|---|---|---|
+| Worker | 500 | 100 | -1 per dig |
+| Soldier | 600 | 150 | none |
+| Nurse | 700 | 80 | none |
+| Larva | 200 | 50 | none |
+| Queen | 20000, unreached | 200 | -1 per 30 ticks, only when Declining |
+
+---
+
+## Queen succession
+
+```
+        larva rolls 0
+              │
+    ┌─────────┴──────────┐
+    │                    │
+Queen == nil        Queen != nil
+    │                    │
+    ▼                    ▼
+ CROWNED           append Queens
+ QueenPosition     Queen.Declining = true
+ = her position          │
+    │                    │
+    ▼                    ▼
+┌────────────┐     ┌───────────┐
+│  REIGNING  │     │   HEIR    │
+│            │     │           │
+│ no ageing  │     │ no ageing │
+│ immortal   │     │ no death  │
+│ until an   │     │ frozen    │
+│ heir       │     └─────┬─────┘
+└─────┬──────┘           │
+      │ Declining        │
+      ▼                  │
+┌────────────┐           │
+│  FADING    │           │
+│ -1hp/30t   │           │
+└─────┬──────┘           │
+      │ Health <= 0      │
+      ▼                  │
+    dead ────────────────┤
+                         │
+              ┌──────────┴──────────┐
+              │                     │
+         Queens[0]            Queens[1:]
+              │                     │
+              ▼                     ▼
+          CROWNED           demoteHeir
+                            20% nurse / 80% worker
+                            same ID, same position
+```
+
+**Invariant:** `Declining` is set only when an heir exists, and heirs cannot die.
+A colony therefore never goes queenless.
+
+---
+
+## Determinism
+
+```
+rng.New(seed) ──▶ World.Rng ──┬──▶ world gen      food scatter, 10%
+                              ├──▶ egg laying     (none, fixed at 1)
+                              ├──▶ caste roll     Below(100)
+                              ├──▶ heir demotion  Below(100)
+                              └──▶ worker walk    Shuffle, Below(4)
+
+math/rand ──▶ nowhere
+```
+
+| | |
+|---|---|
+| Algorithm | xorshift32 |
+| `Below(n)` | `Next() % n`, fixed draw count |
+| App seed | clock |
+| Test seed | fixed |
+| Guarantee | same seed, same colony |
+
+---
+
+## Food
+
+```
+stored as tenths          FoodScale = 10
+
+  map pellet    50 units    5 food
+  grass         50 units    5 food     one-shot, Food = -1 after
+  worker carry  50 or 100
+  colony start 500 units   50 food
+  egg cost       1 unit   0.1 food
+  lay gate     100 units    10 food
+
+display: Food / FoodScale
+```
+
+Integer only. No floats anywhere in the simulation.
+
+---
+
+## Constants
+
+`simulation/updateWorld.go`
+
+| | |
+|---|---|
+| `eggLayingInterval` | 50 |
+| `eggHatchTime` | 30 |
+| `larvaeGrowTime` | 50 |
+| `foodCost` | 1 |
+| `layingThreshold` | 100 |
+| `queenDeclineInterval` | 30 |
+
+`simulation/matureLarvaeToAnt.go`
+
+| Roll | Caste |
+|---|---|
+| 0 | Queen |
+| 1-20 | Nurse |
+| 21-35 | Soldier |
+| 36-99 | Worker |
+
+`gui/antfarm.go`
+
+| | |
+|---|---|
+| `speedPresets` | 0.25, 0.5, 1, 2, 5, 10 |
+| `renderFPS` | 30 |
+
+---
+
+## Gotchas
+
+| | |
+|---|---|
+| `simulation/` declares `package logic` | import as `logic "antfarm/simulation"` |
+| `types/solider.go` | filename is misspelled |
+| `Cell.Food == -1` | harvested grass, not "no food" |
+| `Colony.Queens` | heirs, not all queens |
+
+---
+
+## See also
+
+| | |
+|---|---|
+| `README.md` | what it is, how to run |
+| `WHATNEXT.md` | roadmap |
+| `LIFECYCLE-AUDIT.md` | known behavioural problems |

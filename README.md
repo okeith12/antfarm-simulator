@@ -93,26 +93,18 @@ her, and any other heirs give up the claim and become workers or nurses.
 
 ## Architecture
 
-Full detail in **[ARCHITECTURE.md](ARCHITECTURE.md)**. The short version:
-
-**The simulation core knows nothing about the display.**
+Full detail in **[ARCHITECTURE.md](ARCHITECTURE.md)**.
 
 ```
-gui/  ────uses────>  simulation/  ────uses────>  pathfinder/  ───>  types/
-                                                                      ^
-                                                                      |
-                                              nothing here imports tcell
+gui/  ───▶  simulation/  ───▶  pathfinder/  ───▶  types/  ───▶  rng/
+ │                                                               ▲
+ └── tcell                          nothing right of gui/ ────────┘
+                                    imports tcell
 ```
-
-That arrow never reverses, and it is checkable:
 
 ```bash
-grep -rn "tcell" types simulation pathfinder util rng main.go   # returns nothing
+grep -rn "tcell" types simulation pathfinder util rng main.go   # empty
 ```
-
-The reason is where this is going. The same simulation has to run on a
-microcontroller driving an SPI panel, where no terminal library exists. Anything
-the core knows about rendering is something that has to be torn out later.
 
 ### Project structure
 
@@ -154,22 +146,14 @@ from a rename. Import it as `logic "antfarm/simulation"`.
 
 ### Two decisions that shape everything
 
-**Food is a scaled integer, never a float.** `types.FoodScale = 10`, so food is
-counted internally in tenths and the stats bar divides on the way out. Floats are
-avoided because the firmware port must produce bit-identical results from the
-same seed, and float arithmetic does not survive that across compilers and
-architectures.
-
-**Randomness is injected, never global.** Nothing calls `math/rand`. The
-generator is xorshift32, held on the World:
+| | |
+|---|---|
+| Food | scaled integer, `FoodScale = 10`. No floats anywhere in the simulation. |
+| Randomness | injected xorshift32 on the World. No `math/rand`. Same seed, same colony. |
 
 ```go
-world := types.NewWorld(120, 35, rng.New(seed))
+world := types.NewWorld(120, 35, rng.New(seed))   // clock seed in the app, fixed in tests
 ```
-
-The app seeds from the clock so every run differs. Tests pass fixed seeds. Same
-seed, same colony, always. That reproducibility is what will let the Go and C
-implementations be diffed against each other.
 
 ---
 
