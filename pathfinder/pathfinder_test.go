@@ -1,7 +1,7 @@
 package pathfinder
 
 import (
-	"antfarm/rng"
+	"antfarm/random"
 	"antfarm/types"
 	"testing"
 )
@@ -105,7 +105,7 @@ func TestManhattanDistance(t *testing.T) {
 }
 
 func TestCanMoveTo(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	world.GetCell(5, 5).IsTunnel = true
 
 	if !CanMoveTo(world, 5, 5) {
@@ -120,7 +120,7 @@ func TestCanMoveTo(t *testing.T) {
 }
 
 func TestCanDigTo(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	world.GetCell(10, 10).Soil = types.Rock
 
 	if !CanDigTo(world, 5, 5) {
@@ -135,7 +135,7 @@ func TestCanDigTo(t *testing.T) {
 }
 
 func TestMove(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	world.GetCell(5, 5).IsTunnel = true
 	world.GetCell(6, 5).IsTunnel = true
 
@@ -153,7 +153,7 @@ func TestMove(t *testing.T) {
 }
 
 func TestDigAndMove(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	world.GetCell(5, 5).IsTunnel = true
 
 	worker := types.NewWorker(1, 5, 5, "Red")
@@ -173,7 +173,7 @@ func TestDigAndMove(t *testing.T) {
 }
 
 func TestDigAndMoveHealthCost(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	world.GetCell(5, 5).IsTunnel = true
 
 	worker := types.NewWorker(1, 5, 5, "Red")
@@ -189,7 +189,7 @@ func TestDigAndMoveHealthCost(t *testing.T) {
 }
 
 func TestDigAndMoveMultipleDigsReduceHealth(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 
 	// Create a tunnel starting point
 	world.GetCell(5, 5).IsTunnel = true
@@ -211,7 +211,7 @@ func TestDigAndMoveMultipleDigsReduceHealth(t *testing.T) {
 }
 
 func TestDigAndMoveFail(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	world.GetCell(5, 5).IsTunnel = true
 	world.GetCell(6, 5).Soil = types.Rock
 

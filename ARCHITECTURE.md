@@ -26,7 +26,7 @@
               └─────────┬──────────┘
                         │
               ┌─────────▼──────────┐   ┌────────────────┐
-              │       types/       │──▶│      rng/      │
+              │       types/       │──▶│    random/     │
               │  world · cell      │   │  xorshift32    │
               │  colony · ant      │   └────────────────┘
               │  queen · nurse     │
@@ -45,7 +45,7 @@ World
 ├── Cells           []Cell        flat, row-major
 ├── Colonies        []*Colony
 ├── Ticks           int
-└── Rng             *rng.Rng
+└── Random          *random.Generator
 
 Cell                              Colony
 ├── Soil     Soil                 ├── Queen         *QueenAnt    reigning
@@ -195,10 +195,10 @@ Queen == nil        Queen != nil
 ## Determinism
 
 ```
-rng.New(seed) ──▶ World.Rng ──┬──▶ world gen
-                              ├──▶ caste roll
-                              ├──▶ heir demotion
-                              └──▶ worker walk
+random.New(seed) ──▶ World.Random ──┬──▶ world gen
+                                    ├──▶ caste roll
+                                    ├──▶ heir demotion
+                                    └──▶ worker walk
 
 math/rand ──▶ nowhere
 ```

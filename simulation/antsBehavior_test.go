@@ -1,13 +1,13 @@
 package logic
 
 import (
-	"antfarm/rng"
+	"antfarm/random"
 	"antfarm/types"
 	"testing"
 )
 
 func TestUpdateWorkerAges(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
@@ -25,7 +25,7 @@ func TestUpdateWorkerAges(t *testing.T) {
 }
 
 func TestUpdateSoldierAges(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
@@ -43,7 +43,7 @@ func TestUpdateSoldierAges(t *testing.T) {
 }
 
 func TestUpdateNurseAges(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
@@ -57,7 +57,7 @@ func TestUpdateNurseAges(t *testing.T) {
 }
 
 func TestWorkerPicksUpFood(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
@@ -73,7 +73,7 @@ func TestWorkerPicksUpFood(t *testing.T) {
 }
 
 func TestWorkerDepositsFood(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
@@ -97,7 +97,7 @@ func TestWorkerDepositsFood(t *testing.T) {
 }
 
 func TestLarvaeAges(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 

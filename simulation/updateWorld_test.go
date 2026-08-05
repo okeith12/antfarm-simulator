@@ -1,13 +1,13 @@
 package logic
 
 import (
-	"antfarm/rng"
+	"antfarm/random"
 	"antfarm/types"
 	"testing"
 )
 
 func TestUpdateWorld(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
@@ -19,7 +19,7 @@ func TestUpdateWorld(t *testing.T) {
 }
 
 func TestUpdateWorldMultipleTicks(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
@@ -33,7 +33,7 @@ func TestUpdateWorldMultipleTicks(t *testing.T) {
 }
 
 func TestQueenLaysEggs(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	colony.Food = 200
 	AddColony(world, colony)
@@ -49,7 +49,7 @@ func TestQueenLaysEggs(t *testing.T) {
 }
 
 func TestQueenDoesNotLayEggsWithoutFood(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	colony.Food = 5 // Not enough
 	AddColony(world, colony)
@@ -64,7 +64,7 @@ func TestQueenDoesNotLayEggsWithoutFood(t *testing.T) {
 }
 
 func TestEggsHatchIntoLarvae(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	colony.Eggs = 1
 	AddColony(world, colony)
@@ -82,7 +82,7 @@ func TestEggsHatchIntoLarvae(t *testing.T) {
 func TestLarvaeBecomesWorker(t *testing.T) {
 	// Maturing rolls for a role: 20% nurse, 15% soldier, 65% worker. Seed 2 rolls
 	// a worker, so this asserts the exact outcome instead of a 65% coin flip.
-	world := types.NewWorld(40, 30, rng.New(2))
+	world := types.NewWorld(40, 30, random.New(2))
 	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
@@ -102,7 +102,7 @@ func TestLarvaeBecomesWorker(t *testing.T) {
 }
 
 func TestUpdateWorldEmptyWorld(t *testing.T) {
-	world := types.NewWorld(40, 30, rng.New(1))
+	world := types.NewWorld(40, 30, random.New(1))
 
 	// Should not panic
 	UpdateWorld(world)
@@ -116,7 +116,7 @@ func TestUpdateWorldEmptyWorld(t *testing.T) {
 // depends on: one seed, many ticks, identical colony state every time.
 func TestSameSeedProducesSameColony(t *testing.T) {
 	run := func(seed uint32) (int, int, int, int, int) {
-		world := types.NewWorld(60, 30, rng.New(seed))
+		world := types.NewWorld(60, 30, random.New(seed))
 		colony := types.NewColony("Red", 15, 10, types.ColonyRed)
 		AddColony(world, colony)
 		for i := 0; i < 500; i++ {

@@ -1,4 +1,4 @@
-package rng
+package random
 
 import "testing"
 

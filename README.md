@@ -96,14 +96,14 @@ her, and any other heirs give up the claim and become workers or nurses.
 Full detail in **[ARCHITECTURE.md](ARCHITECTURE.md)**.
 
 ```
-gui/  ───▶  simulation/  ───▶  pathfinder/  ───▶  types/  ───▶  rng/
+gui/  ───▶  simulation/  ───▶  pathfinder/  ───▶  types/  ───▶  random/
  │                                                               ▲
  └── tcell                          nothing right of gui/ ────────┘
                                     imports tcell
 ```
 
 ```bash
-grep -rn "tcell" types simulation pathfinder util rng main.go   # empty
+grep -rn "tcell" types simulation pathfinder util random main.go   # empty
 ```
 
 ### Project structure
@@ -137,7 +137,7 @@ antfarm/
 │   ├── antfarm.go       # Game loop, input, speed and pause
 │   └── renderer.go  stats.go  controls.go  colors.go
 │
-├── rng/                 # Deterministic xorshift32
+├── random/                 # Deterministic xorshift32
 └── util/                # Abs()
 ```
 
@@ -152,7 +152,7 @@ from a rename. Import it as `logic "antfarm/simulation"`.
 | Randomness | injected xorshift32 on the World. No `math/rand`. Same seed, same colony. |
 
 ```go
-world := types.NewWorld(120, 35, rng.New(seed))   // clock seed in the app, fixed in tests
+world := types.NewWorld(120, 35, random.New(seed))   // clock seed in the app, fixed in tests
 ```
 
 ---
@@ -186,7 +186,7 @@ go test ./...     # 111 tests across 6 packages
 ```
 
 Everything is deterministic, so a flaky test here means a real bug rather than
-bad luck. Two properties matter most: `rng` proves that one seed always gives one
+bad luck. Two properties matter most: `random` proves that one seed always gives one
 sequence, and `TestSameSeedProducesSameColony` runs 500 ticks twice on a single
 seed and compares the whole colony.
 

@@ -1,7 +1,7 @@
 package pathfinder
 
 import (
-	"antfarm/rng"
+	"antfarm/random"
 	"antfarm/types"
 	"testing"
 )
@@ -30,7 +30,7 @@ func TestNurseIsAdjacentToLarvae(t *testing.T) {
 }
 
 func TestNurseGuardNursery(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	np := NewNursePathfinder()
 
 	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
@@ -53,7 +53,7 @@ func TestNurseGuardNursery(t *testing.T) {
 }
 
 func TestNurseGuardNurseryMovesCloser(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	np := NewNursePathfinder()
 
 	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
@@ -77,7 +77,7 @@ func TestNurseGuardNurseryMovesCloser(t *testing.T) {
 }
 
 func TestNurseMoveTowardQueen(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	np := NewNursePathfinder()
 
 	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
@@ -99,7 +99,7 @@ func TestNurseMoveTowardQueen(t *testing.T) {
 }
 
 func TestNurseMoveTowardLarvae(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	np := NewNursePathfinder()
 
 	colony := types.NewColony("Red", 10, 10, types.ColonyRed)

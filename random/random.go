@@ -1,4 +1,4 @@
-// Package rng provides the simulation's deterministic pseudo-random source.
+// Package random provides the simulation's deterministic pseudo-random source.
 //
 // The algorithm is xorshift32, chosen because it is trivial to reimplement
 // identically in C++ for the firmware port. The same seed must always produce
@@ -8,26 +8,26 @@
 //
 // Nothing here uses math/rand. The simulation must never call the global
 // generator, because an unseeded run cannot be reproduced or compared.
-package rng
+package random
 
-// Rng is a deterministic xorshift32 generator.
+// Generator is a deterministic xorshift32 generator.
 // It is not safe for concurrent use; the simulation is single-threaded.
-type Rng struct {
+type Generator struct {
 	state uint32
 }
 
 // New creates a generator from the given seed.
 // A zero seed would make xorshift32 emit only zeroes, so it is replaced with
 // the golden-ratio constant that the firmware spec uses for the same reason.
-func New(seed uint32) *Rng {
+func New(seed uint32) *Generator {
 	if seed == 0 {
 		seed = 0x9E3779B9
 	}
-	return &Rng{state: seed}
+	return &Generator{state: seed}
 }
 
 // Next returns the next raw 32-bit value in the sequence.
-func (r *Rng) Next() uint32 {
+func (r *Generator) Next() uint32 {
 	x := r.state
 	x ^= x << 13
 	x ^= x >> 17
@@ -42,7 +42,7 @@ func (r *Rng) Next() uint32 {
 // That is deliberate: the reduction has to be reproducible bit-for-bit in C++,
 // and a rejection-sampling scheme would consume a variable number of draws and
 // desynchronise the two sequences.
-func (r *Rng) Below(n uint32) uint32 {
+func (r *Generator) Below(n uint32) uint32 {
 	if n == 0 {
 		return 0
 	}
@@ -50,7 +50,7 @@ func (r *Rng) Below(n uint32) uint32 {
 }
 
 // Range returns a value in [lo, hi). It returns lo when hi is not above lo.
-func (r *Rng) Range(lo, hi int32) int32 {
+func (r *Generator) Range(lo, hi int32) int32 {
 	if hi <= lo {
 		return lo
 	}
@@ -59,7 +59,7 @@ func (r *Rng) Range(lo, hi int32) int32 {
 
 // Chance reports whether a percent-in-100 roll succeeds.
 // Chance(10) is true one time in ten.
-func (r *Rng) Chance(percent uint32) bool {
+func (r *Generator) Chance(percent uint32) bool {
 	return r.Below(100) < percent
 }
 
@@ -67,7 +67,7 @@ func (r *Rng) Chance(percent uint32) bool {
 //
 // This is Fisher-Yates walking downward, matching the order the C++ port will
 // use so that a shuffled slice comes out identical in both implementations.
-func (r *Rng) Shuffle(n int, swap func(i, j int)) {
+func (r *Generator) Shuffle(n int, swap func(i, j int)) {
 	for i := n - 1; i > 0; i-- {
 		j := int(r.Below(uint32(i + 1)))
 		swap(i, j)

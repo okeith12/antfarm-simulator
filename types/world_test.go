@@ -1,12 +1,12 @@
 package types
 
 import (
-	"antfarm/rng"
+	"antfarm/random"
 	"testing"
 )
 
 func TestNewWorld(t *testing.T) {
-	world := NewWorld(80, 40, rng.New(1))
+	world := NewWorld(80, 40, random.New(1))
 
 	if world.Width != 80 {
 		t.Errorf("Expected Width 80, got %d", world.Width)
@@ -23,7 +23,7 @@ func TestNewWorld(t *testing.T) {
 }
 
 func TestWorldIndexIsRowMajor(t *testing.T) {
-	world := NewWorld(80, 40, rng.New(1))
+	world := NewWorld(80, 40, random.New(1))
 
 	// Row-major: stepping x moves one slot, stepping y moves a whole row.
 	if got := world.Index(0, 0); got != 0 {
@@ -57,7 +57,7 @@ func TestWorldIndexIsRowMajor(t *testing.T) {
 }
 
 func TestGetCellAliasesTheSameStorage(t *testing.T) {
-	world := NewWorld(80, 40, rng.New(1))
+	world := NewWorld(80, 40, random.New(1))
 
 	// GetCell hands back a pointer into the flat slice, not a copy, so writes
 	// through it must be visible to the next reader.
@@ -71,7 +71,7 @@ func TestGetCellAliasesTheSameStorage(t *testing.T) {
 }
 
 func TestWorldIsValidPosition(t *testing.T) {
-	world := NewWorld(80, 40, rng.New(1))
+	world := NewWorld(80, 40, random.New(1))
 
 	if !world.IsValidPosition(0, 0) {
 		t.Error("(0,0) should be valid")
@@ -91,7 +91,7 @@ func TestWorldIsValidPosition(t *testing.T) {
 }
 
 func TestGetCell(t *testing.T) {
-	world := NewWorld(80, 40, rng.New(1))
+	world := NewWorld(80, 40, random.New(1))
 
 	cell := world.GetCell(10, 5)
 	if cell == nil {

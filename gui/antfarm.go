@@ -1,7 +1,7 @@
 package gui
 
 import (
-	"antfarm/rng"
+	"antfarm/random"
 	logic "antfarm/simulation"
 	"antfarm/types"
 	"time"
@@ -64,7 +64,7 @@ func NewAntfarm() (*Antfarm, error) {
 	// passing a fixed seed here reproduces one exactly.
 	width, height := screen.Size()
 	seed := uint32(time.Now().UnixNano())
-	world := types.NewWorld(width, height-5, rng.New(seed)) // Reserve space for stats and controls
+	world := types.NewWorld(width, height-5, random.New(seed)) // Reserve space for stats and controls
 
 	// Create initial colony
 	// Queen position determines where the colony's nest begins

@@ -137,7 +137,7 @@ func demoteHeir(world *types.World, colony *types.Colony, heir *types.QueenAnt) 
 	RemoveAnt(world, heir)
 
 	var replacement types.AntInterface
-	if world.Rng.Below(100) < nurseSpawnChance {
+	if world.Random.Below(100) < nurseSpawnChance {
 		replacement = SpawnNurseWithID(colony, heir.ID, x, y)
 	} else {
 		replacement = SpawnWorkerWithID(colony, heir.ID, x, y)

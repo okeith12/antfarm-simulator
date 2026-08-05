@@ -100,7 +100,7 @@ func updateColony(world *types.World, colony *types.Colony) {
 
 			// Determine what role this larvae becomes
 			// Rolls 1-100, then checks thresholds
-			newAnt := matureLarvaeToAnt(colony, larvae, int(world.Rng.Below(100)))
+			newAnt := matureLarvaeToAnt(colony, larvae, int(world.Random.Below(100)))
 
 			// Place worker in world
 			PlaceAnt(world, newAnt)

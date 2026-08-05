@@ -1,6 +1,6 @@
 package types
 
-import "antfarm/rng"
+import "antfarm/random"
 
 // world.go - Defines the game world (the entire ant farm environment)
 // The world is a 2D grid of cells containing terrain, tunnels, and ants
@@ -8,12 +8,12 @@ import "antfarm/rng"
 // World represents the entire  environment
 // Contains the grid of cells, all colonies, and tracks simulation time
 type World struct {
-	Width    int       // Width of the world
-	Height   int       // Height of the world
-	Cells    []Cell    // Flat grid, row-major: the cell at (x, y) is Cells[y*Width+x]
-	Colonies []*Colony // All ant colonies in this world
-	Ticks    int       // Number of updates that have occurred
-	Rng      *rng.Rng  // Deterministic random source for the whole simulation
+	Width    int               // Width of the world
+	Height   int               // Height of the world
+	Cells    []Cell            // Flat grid, row-major: the cell at (x, y) is Cells[y*Width+x]
+	Colonies []*Colony         // All ant colonies in this world
+	Ticks    int               // Number of updates that have occurred
+	Random   *random.Generator // Deterministic random source for the whole simulation
 }
 
 // NewWorld creates a new world with procedurally generated terrain
@@ -21,7 +21,7 @@ type World struct {
 //
 // The generator is injected rather than taken from the global pool so that a
 // given seed always reproduces the same world and colony.
-func NewWorld(width, height int, r *rng.Rng) *World {
+func NewWorld(width, height int, r *random.Generator) *World {
 	cells := make([]Cell, width*height)
 
 	for y := 0; y < height; y++ {
@@ -53,7 +53,7 @@ func NewWorld(width, height int, r *rng.Rng) *World {
 		Cells:    cells,
 		Colonies: []*Colony{},
 		Ticks:    0,
-		Rng:      r,
+		Random:   r,
 	}
 }
 

@@ -1,7 +1,7 @@
 package pathfinder
 
 import (
-	"antfarm/rng"
+	"antfarm/random"
 	"antfarm/types"
 	"testing"
 )
@@ -14,7 +14,7 @@ func TestNewWorkerPathfinder(t *testing.T) {
 }
 
 func TestWorkerMoveRandomly(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	wp := NewWorkerPathfinder()
 
 	worker := types.NewWorker(1, 10, 1, "Red")
@@ -27,7 +27,7 @@ func TestWorkerMoveRandomly(t *testing.T) {
 }
 
 func TestWorkerBringFoodToQueen(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	wp := NewWorkerPathfinder()
 
 	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
@@ -66,7 +66,7 @@ func TestWorkerIsAdjacentToTarget(t *testing.T) {
 }
 
 func TestWorkerMoveTowardTarget(t *testing.T) {
-	world := types.NewWorld(20, 20, rng.New(1))
+	world := types.NewWorld(20, 20, random.New(1))
 	wp := NewWorkerPathfinder()
 
 	// Create tunnel path

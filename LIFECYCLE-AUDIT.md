@@ -123,7 +123,7 @@ code diverged from "plateaus at 10 ants" to "collapses to 0", so there was no
 way to tell whether a balance change helped or the dice simply landed
 differently.
 
-Resolved: the `rng` package now provides a seeded xorshift32 generator, injected
+Resolved: the `random` package now provides a seeded xorshift32 generator, injected
 through `World.Rng`. Nothing in the simulation calls the global pool. Re-measure
 any balance change against a fixed seed.
 
@@ -152,7 +152,7 @@ Not yet chosen. Listed cheapest-first; they are complementary, not exclusive.
 | # | Fix | Scope | Notes |
 |---|---|---|---|
 | 1 | **Deadlock guard** | Small | Make 0 workers recoverable: emergency worker spawn, or align the laying gate with `foodCost`. Removes the hard-lock; colony still starves. |
-| 2 | ~~**Seeded PRNG injection**~~ | Done | Landed as the `rng` package, injected via `World.Rng`. Port blocker 4 cleared. |
+| 2 | ~~**Seeded PRNG injection**~~ | Done | Landed as the `random` package, injected via `World.Rng`. Port blocker 4 cleared. |
 | 3 | **Drain the egg queue properly** | Small | Hatch proportional to backlog rather than one per 30 ticks, or charge food at hatch time instead of lay time. |
 | 4 | **Economy rebalance** | Medium | Egg cost, laying gate, worker lifespan vs round-trip length, HP cost per dig. |
 | 5 | **Food scent detection** | Medium | Pull forward from `WHATNEXT.md` §9. Attacks the root inefficiency, the blind random walk, and is the highest gameplay payoff. |
@@ -170,7 +170,7 @@ the module that calls `types.NewWorld` + `types.NewColony` + `logic.AddColony`,
 then loops `logic.UpdateWorld` and prints colony counters. Delete it afterward.
 It must not ship in the repo.
 
-Pass a fixed seed (`types.NewWorld(w, h, rng.New(seed))`) so the run can be
+Pass a fixed seed (`types.NewWorld(w, h, random.New(seed))`) so the run can be
 repeated exactly.
 
 Note that `simulation` is imported as package name `logic` (the directory was
