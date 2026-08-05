@@ -47,7 +47,7 @@ func TestAddMultipleColonies(t *testing.T) {
 
 func TestPlaceAnt(t *testing.T) {
 	world := types.NewWorld(40, 30, rng.New(1))
-	world.Grid[10][10].IsTunnel = true
+	world.GetCell(10, 10).IsTunnel = true
 
 	worker := types.NewWorker(1, 10, 10, "Red")
 	success := PlaceAnt(world, worker)
@@ -55,14 +55,14 @@ func TestPlaceAnt(t *testing.T) {
 	if !success {
 		t.Error("PlaceAnt should succeed for empty tunnel")
 	}
-	if world.Grid[10][10].Occupant != worker {
+	if world.GetCell(10, 10).Occupant != worker {
 		t.Error("Worker should be in cell")
 	}
 }
 
 func TestPlaceAntFailsOnOccupied(t *testing.T) {
 	world := types.NewWorld(40, 30, rng.New(1))
-	world.Grid[10][10].IsTunnel = true
+	world.GetCell(10, 10).IsTunnel = true
 
 	worker1 := types.NewWorker(1, 10, 10, "Red")
 	worker2 := types.NewWorker(2, 10, 10, "Red")
@@ -88,22 +88,22 @@ func TestPlaceAntFailsOnNonTunnel(t *testing.T) {
 
 func TestRemoveAnt(t *testing.T) {
 	world := types.NewWorld(40, 30, rng.New(1))
-	world.Grid[10][10].IsTunnel = true
+	world.GetCell(10, 10).IsTunnel = true
 
 	worker := types.NewWorker(1, 10, 10, "Red")
 	PlaceAnt(world, worker)
 
 	RemoveAnt(world, worker)
 
-	if world.Grid[10][10].Occupant != nil {
+	if world.GetCell(10, 10).Occupant != nil {
 		t.Error("Cell should be empty after RemoveAnt")
 	}
 }
 
 func TestMoveAnt(t *testing.T) {
 	world := types.NewWorld(40, 30, rng.New(1))
-	world.Grid[10][10].IsTunnel = true
-	world.Grid[10][11].IsTunnel = true
+	world.GetCell(10, 10).IsTunnel = true
+	world.GetCell(11, 10).IsTunnel = true
 
 	worker := types.NewWorker(1, 10, 10, "Red")
 	PlaceAnt(world, worker)
@@ -116,17 +116,17 @@ func TestMoveAnt(t *testing.T) {
 	if worker.Position.X != 11 || worker.Position.Y != 10 {
 		t.Errorf("Worker should be at (11,10), got (%d,%d)", worker.Position.X, worker.Position.Y)
 	}
-	if world.Grid[10][10].Occupant != nil {
+	if world.GetCell(10, 10).Occupant != nil {
 		t.Error("Old cell should be empty")
 	}
-	if world.Grid[10][11].Occupant != worker {
+	if world.GetCell(11, 10).Occupant != worker {
 		t.Error("New cell should have worker")
 	}
 }
 
 func TestMoveAntFailsOnInvalid(t *testing.T) {
 	world := types.NewWorld(40, 30, rng.New(1))
-	world.Grid[10][10].IsTunnel = true
+	world.GetCell(10, 10).IsTunnel = true
 
 	worker := types.NewWorker(1, 10, 10, "Red")
 	PlaceAnt(world, worker)
@@ -140,8 +140,8 @@ func TestMoveAntFailsOnInvalid(t *testing.T) {
 
 func TestMoveAntFailsOnOccupied(t *testing.T) {
 	world := types.NewWorld(40, 30, rng.New(1))
-	world.Grid[10][10].IsTunnel = true
-	world.Grid[10][11].IsTunnel = true
+	world.GetCell(10, 10).IsTunnel = true
+	world.GetCell(11, 10).IsTunnel = true
 
 	worker1 := types.NewWorker(1, 10, 10, "Red")
 	worker2 := types.NewWorker(2, 11, 10, "Red")

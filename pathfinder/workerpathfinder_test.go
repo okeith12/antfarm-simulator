@@ -18,7 +18,7 @@ func TestWorkerMoveRandomly(t *testing.T) {
 	wp := NewWorkerPathfinder()
 
 	worker := types.NewWorker(1, 10, 1, "Red")
-	world.Grid[1][10].Occupant = worker
+	world.GetCell(10, 1).Occupant = worker
 
 	moved := wp.MoveRandomly(world, worker)
 	if !moved {
@@ -34,13 +34,13 @@ func TestWorkerBringFoodToQueen(t *testing.T) {
 
 	// Create tunnel path
 	for x := 8; x <= 12; x++ {
-		world.Grid[10][x].IsTunnel = true
+		world.GetCell(x, 10).IsTunnel = true
 	}
-	world.Grid[10][10].Occupant = colony.Queen
+	world.GetCell(10, 10).Occupant = colony.Queen
 
 	worker := types.NewWorker(2, 8, 10, "Red")
 	worker.CarryingFood = true
-	world.Grid[10][8].Occupant = worker
+	world.GetCell(8, 10).Occupant = worker
 
 	success := wp.BringFoodToQueen(world, colony, worker)
 
@@ -71,11 +71,11 @@ func TestWorkerMoveTowardTarget(t *testing.T) {
 
 	// Create tunnel path
 	for x := 5; x <= 15; x++ {
-		world.Grid[10][x].IsTunnel = true
+		world.GetCell(x, 10).IsTunnel = true
 	}
 
 	worker := types.NewWorker(1, 5, 10, "Red")
-	world.Grid[10][5].Occupant = worker
+	world.GetCell(5, 10).Occupant = worker
 
 	target := types.Position{X: 15, Y: 10}
 	success := wp.MoveTowardTarget(world, worker, target)

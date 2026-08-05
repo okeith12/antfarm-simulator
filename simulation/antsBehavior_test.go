@@ -12,7 +12,7 @@ func TestUpdateWorkerAges(t *testing.T) {
 	AddColony(world, colony)
 
 	worker := SpawnWorker(colony, 20, 14)
-	world.Grid[14][20].IsTunnel = true
+	world.GetCell(20, 14).IsTunnel = true
 	PlaceAnt(world, worker)
 
 	initialAge := worker.Age
@@ -30,7 +30,7 @@ func TestUpdateSoldierAges(t *testing.T) {
 	AddColony(world, colony)
 
 	soldier := SpawnSoldier(colony, 20, 14)
-	world.Grid[14][20].IsTunnel = true
+	world.GetCell(20, 14).IsTunnel = true
 	PlaceAnt(world, soldier)
 
 	initialAge := soldier.Age
@@ -62,7 +62,7 @@ func TestWorkerPicksUpFood(t *testing.T) {
 	AddColony(world, colony)
 
 	worker := SpawnWorker(colony, 10, 1)
-	world.Grid[1][10].Food = 5
+	world.GetCell(10, 1).Food = 5
 	PlaceAnt(world, worker)
 
 	UpdateWorld(world)
@@ -81,7 +81,7 @@ func TestWorkerDepositsFood(t *testing.T) {
 	worker := SpawnWorker(colony, 21, 15)
 	worker.CarryingFood = true
 	worker.FoodAmount = 10
-	world.Grid[15][21].IsTunnel = true
+	world.GetCell(21, 15).IsTunnel = true
 	PlaceAnt(world, worker)
 
 	initialFood := colony.Food
@@ -102,7 +102,7 @@ func TestLarvaeAges(t *testing.T) {
 	AddColony(world, colony)
 
 	larvae := SpawnLarvae(colony, 21, 15)
-	world.Grid[15][21].IsTunnel = true
+	world.GetCell(21, 15).IsTunnel = true
 	PlaceAnt(world, larvae)
 
 	initialAge := larvae.Age

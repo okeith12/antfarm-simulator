@@ -55,7 +55,7 @@ func (r *Renderer) Render(world *types.World, paused bool, speed float64) {
 	// Draw the world grid (terrain and ants)
 	for y := 0; y < world.Height; y++ {
 		for x := 0; x < world.Width; x++ {
-			cell := world.Grid[y][x]
+			cell := world.GetCell(x, y)
 
 			var ch rune
 			var fgColor tcell.Color

@@ -38,13 +38,13 @@ func TestNurseGuardNursery(t *testing.T) {
 	// Create tunnels around queen
 	for x := 8; x <= 12; x++ {
 		for y := 8; y <= 12; y++ {
-			world.Grid[y][x].IsTunnel = true
+			world.GetCell(x, y).IsTunnel = true
 		}
 	}
 
 	// Nurse within 2 cells should guard
 	nurse := types.NewNurse(2, 11, 10, "Red")
-	world.Grid[10][11].Occupant = nurse
+	world.GetCell(11, 10).Occupant = nurse
 
 	isGuarding := np.GuardNursery(world, colony, nurse)
 	if !isGuarding {
@@ -61,14 +61,14 @@ func TestNurseGuardNurseryMovesCloser(t *testing.T) {
 	// Create tunnels
 	for x := 5; x <= 15; x++ {
 		for y := 8; y <= 12; y++ {
-			world.Grid[y][x].IsTunnel = true
+			world.GetCell(x, y).IsTunnel = true
 		}
 	}
-	world.Grid[10][10].Occupant = colony.Queen
+	world.GetCell(10, 10).Occupant = colony.Queen
 
 	// Nurse far from queen should move closer
 	nurse := types.NewNurse(2, 5, 10, "Red")
-	world.Grid[10][5].Occupant = nurse
+	world.GetCell(5, 10).Occupant = nurse
 
 	isGuarding := np.GuardNursery(world, colony, nurse)
 	if isGuarding {
@@ -84,12 +84,12 @@ func TestNurseMoveTowardQueen(t *testing.T) {
 
 	// Create tunnels
 	for x := 5; x <= 15; x++ {
-		world.Grid[10][x].IsTunnel = true
+		world.GetCell(x, 10).IsTunnel = true
 	}
-	world.Grid[10][10].Occupant = colony.Queen
+	world.GetCell(10, 10).Occupant = colony.Queen
 
 	nurse := types.NewNurse(2, 5, 10, "Red")
-	world.Grid[10][5].Occupant = nurse
+	world.GetCell(5, 10).Occupant = nurse
 
 	success := np.MoveTowardQueen(world, colony, nurse)
 
@@ -106,12 +106,12 @@ func TestNurseMoveTowardLarvae(t *testing.T) {
 
 	// Create tunnels
 	for x := 5; x <= 15; x++ {
-		world.Grid[10][x].IsTunnel = true
+		world.GetCell(x, 10).IsTunnel = true
 	}
-	world.Grid[10][10].Occupant = colony.Queen
+	world.GetCell(10, 10).Occupant = colony.Queen
 
 	nurse := types.NewNurse(2, 5, 10, "Red")
-	world.Grid[10][5].Occupant = nurse
+	world.GetCell(5, 10).Occupant = nurse
 
 	larvaePos := types.Position{X: 15, Y: 10}
 	success := np.MoveTowardLarvae(world, colony, nurse, larvaePos)

@@ -106,7 +106,7 @@ func TestManhattanDistance(t *testing.T) {
 
 func TestCanMoveTo(t *testing.T) {
 	world := types.NewWorld(20, 20, rng.New(1))
-	world.Grid[5][5].IsTunnel = true
+	world.GetCell(5, 5).IsTunnel = true
 
 	if !CanMoveTo(world, 5, 5) {
 		t.Error("Should be able to move to empty tunnel")
@@ -121,7 +121,7 @@ func TestCanMoveTo(t *testing.T) {
 
 func TestCanDigTo(t *testing.T) {
 	world := types.NewWorld(20, 20, rng.New(1))
-	world.Grid[10][10].Soil = types.Rock
+	world.GetCell(10, 10).Soil = types.Rock
 
 	if !CanDigTo(world, 5, 5) {
 		t.Error("Should be able to dig sand")
@@ -136,35 +136,35 @@ func TestCanDigTo(t *testing.T) {
 
 func TestMove(t *testing.T) {
 	world := types.NewWorld(20, 20, rng.New(1))
-	world.Grid[5][5].IsTunnel = true
-	world.Grid[5][6].IsTunnel = true
+	world.GetCell(5, 5).IsTunnel = true
+	world.GetCell(6, 5).IsTunnel = true
 
 	worker := types.NewWorker(1, 5, 5, "Red")
-	world.Grid[5][5].Occupant = worker
+	world.GetCell(5, 5).Occupant = worker
 
 	Move(world, worker, 6, 5)
 
 	if worker.Position.X != 6 || worker.Position.Y != 5 {
 		t.Errorf("Worker should be at (6,5), got (%d,%d)", worker.Position.X, worker.Position.Y)
 	}
-	if world.Grid[5][5].Occupant != nil {
+	if world.GetCell(5, 5).Occupant != nil {
 		t.Error("Old cell should be empty")
 	}
 }
 
 func TestDigAndMove(t *testing.T) {
 	world := types.NewWorld(20, 20, rng.New(1))
-	world.Grid[5][5].IsTunnel = true
+	world.GetCell(5, 5).IsTunnel = true
 
 	worker := types.NewWorker(1, 5, 5, "Red")
-	world.Grid[5][5].Occupant = worker
+	world.GetCell(5, 5).Occupant = worker
 
 	dm := DigAndMove(world, worker, 6, 5)
 
 	if !dm {
 		t.Error("DigAndMove should happen on a diggable cell")
 	}
-	if !world.Grid[5][6].IsTunnel {
+	if !world.GetCell(6, 5).IsTunnel {
 		t.Error("Cell should now be a tunnel")
 	}
 	if worker.Position.X != 6 {
@@ -174,10 +174,10 @@ func TestDigAndMove(t *testing.T) {
 
 func TestDigAndMoveHealthCost(t *testing.T) {
 	world := types.NewWorld(20, 20, rng.New(1))
-	world.Grid[5][5].IsTunnel = true
+	world.GetCell(5, 5).IsTunnel = true
 
 	worker := types.NewWorker(1, 5, 5, "Red")
-	world.Grid[5][5].Occupant = worker
+	world.GetCell(5, 5).Occupant = worker
 	initialHealth := worker.Health
 
 	DigAndMove(world, worker, 6, 5)
@@ -192,10 +192,10 @@ func TestDigAndMoveMultipleDigsReduceHealth(t *testing.T) {
 	world := types.NewWorld(20, 20, rng.New(1))
 
 	// Create a tunnel starting point
-	world.Grid[5][5].IsTunnel = true
+	world.GetCell(5, 5).IsTunnel = true
 
 	worker := types.NewWorker(1, 5, 5, "Red")
-	world.Grid[5][5].Occupant = worker
+	world.GetCell(5, 5).Occupant = worker
 	initialHealth := worker.Health
 
 	// Dig 5 cells in a row
@@ -212,8 +212,8 @@ func TestDigAndMoveMultipleDigsReduceHealth(t *testing.T) {
 
 func TestDigAndMoveFail(t *testing.T) {
 	world := types.NewWorld(20, 20, rng.New(1))
-	world.Grid[5][5].IsTunnel = true
-	world.Grid[5][6].Soil = types.Rock
+	world.GetCell(5, 5).IsTunnel = true
+	world.GetCell(6, 5).Soil = types.Rock
 
 	worker := types.NewWorker(1, 5, 5, "Red")
 

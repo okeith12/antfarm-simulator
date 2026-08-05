@@ -10,7 +10,7 @@ import "antfarm/rng"
 type World struct {
 	Width    int       // Width of the world
 	Height   int       // Height of the world
-	Grid     [][]*Cell // 2D grid of cells
+	Cells    []Cell    // Flat grid, row-major: the cell at (x, y) is Cells[y*Width+x]
 	Colonies []*Colony // All ant colonies in this world
 	Ticks    int       // Number of updates that have occurred
 	Rng      *rng.Rng  // Deterministic random source for the whole simulation
@@ -22,36 +22,35 @@ type World struct {
 // The generator is injected rather than taken from the global pool so that a
 // given seed always reproduces the same world and colony.
 func NewWorld(width, height int, r *rng.Rng) *World {
-	grid := make([][]*Cell, height)
+	cells := make([]Cell, width*height)
 
 	for y := 0; y < height; y++ {
-		grid[y] = make([]*Cell, width)
 		for x := 0; x < width; x++ {
 			// Generate terrain
 			soilType := generateSoilType(y, height)
-			grid[y][x] = NewCell(soilType)
+			cells[y*width+x] = *NewCell(soilType)
 		}
 	}
 
 	// Create surface (top 2 rows are empty)
 	for y := 0; y < 2; y++ {
 		for x := 0; x < width; x++ {
-			grid[y][x].Soil = Empty
-			grid[y][x].IsTunnel = true
+			cells[y*width+x].Soil = Empty
+			cells[y*width+x].IsTunnel = true
 		}
 	}
 
 	// Scatter food on surface (top row)
 	for x := 0; x < width; x++ {
 		if r.Chance(10) { // 10% chance of food
-			grid[1][x].Food = 5 // Food pellet
+			cells[1*width+x].Food = 5 // Food pellet
 		}
 	}
 
 	return &World{
 		Width:    width,
 		Height:   height,
-		Grid:     grid,
+		Cells:    cells,
 		Colonies: []*Colony{},
 		Ticks:    0,
 		Rng:      r,
@@ -90,11 +89,22 @@ func (w *World) IsValidPosition(x, y int) bool {
 	return x >= 0 && x < w.Width && y >= 0 && y < w.Height
 }
 
+// Index returns the offset of (x, y) in the flat cell slice.
+//
+// Row-major: skip y whole rows of Width cells, then step x along the current
+// row. The caller must have checked bounds; GetCell does that.
+//
+// This is the 2D case of the firmware's 3D formula, (z*Height + y)*Width + x,
+// so the port is a mechanical translation rather than a redesign.
+func (w *World) Index(x, y int) int {
+	return y*w.Width + x
+}
+
 // GetCell safely retrieves a cell at the given position
 // Returns nil if the position is out of bounds
 func (w *World) GetCell(x, y int) *Cell {
 	if !w.IsValidPosition(x, y) {
 		return nil
 	}
-	return w.Grid[y][x]
+	return &w.Cells[w.Index(x, y)]
 }

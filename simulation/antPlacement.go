@@ -16,7 +16,7 @@ func AddColony(world *types.World, colony *types.Colony) {
 	if colony.Queen != nil {
 		pos := colony.Queen.Position
 		if world.IsValidPosition(pos.X, pos.Y) {
-			cell := world.Grid[pos.Y][pos.X]
+			cell := world.GetCell(pos.X, pos.Y)
 			cell.IsTunnel = true
 			cell.Occupant = colony.Queen
 		}
@@ -26,7 +26,7 @@ func AddColony(world *types.World, colony *types.Colony) {
 	if colony.HeadNurse != nil {
 		pos := colony.HeadNurse.Position
 		if world.IsValidPosition(pos.X, pos.Y) {
-			cell := world.Grid[pos.Y][pos.X]
+			cell := world.GetCell(pos.X, pos.Y)
 			cell.IsTunnel = true
 			cell.Occupant = colony.HeadNurse
 		}
@@ -36,7 +36,7 @@ func AddColony(world *types.World, colony *types.Colony) {
 	for _, nurse := range colony.Nurses {
 		pos := nurse.Position
 		if world.IsValidPosition(pos.X, pos.Y) {
-			cell := world.Grid[pos.Y][pos.X]
+			cell := world.GetCell(pos.X, pos.Y)
 			if cell.IsTunnel && cell.Occupant == nil {
 				cell.Occupant = nurse
 			}
@@ -47,7 +47,7 @@ func AddColony(world *types.World, colony *types.Colony) {
 	for _, worker := range colony.Workers {
 		pos := worker.Position
 		if world.IsValidPosition(pos.X, pos.Y) {
-			cell := world.Grid[pos.Y][pos.X]
+			cell := world.GetCell(pos.X, pos.Y)
 			if cell.IsTunnel && cell.Occupant == nil {
 				cell.Occupant = worker
 			}
@@ -58,7 +58,7 @@ func AddColony(world *types.World, colony *types.Colony) {
 	for _, soldier := range colony.Soldiers {
 		pos := soldier.Position
 		if world.IsValidPosition(pos.X, pos.Y) {
-			cell := world.Grid[pos.Y][pos.X]
+			cell := world.GetCell(pos.X, pos.Y)
 			if cell.IsTunnel && cell.Occupant == nil {
 				cell.Occupant = soldier
 			}
@@ -73,7 +73,7 @@ func PlaceAnt(world *types.World, ant types.AntInterface) bool {
 		return false
 	}
 
-	cell := world.Grid[pos.Y][pos.X]
+	cell := world.GetCell(pos.X, pos.Y)
 	if cell.IsTunnel && cell.Occupant == nil {
 		cell.Occupant = ant
 		return true
@@ -85,7 +85,7 @@ func PlaceAnt(world *types.World, ant types.AntInterface) bool {
 func RemoveAnt(world *types.World, ant types.AntInterface) {
 	pos := ant.GetAnt().Position
 	if world.IsValidPosition(pos.X, pos.Y) {
-		cell := world.Grid[pos.Y][pos.X]
+		cell := world.GetCell(pos.X, pos.Y)
 		if cell.Occupant != nil && cell.Occupant.GetAnt().ID == ant.GetAnt().ID {
 			cell.Occupant = nil
 		}
