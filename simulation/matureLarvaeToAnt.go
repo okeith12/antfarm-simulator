@@ -7,10 +7,10 @@ import "antfarm/types"
 // Role spawn chances (out of 100)
 // Adjust these values to change the distribution of ant types
 const (
-	queenSpawnChance   = 2  // 2% chance to become a queen (0-1)
-	nurseSpawnChance   = 20 // 20% chance to become nurse (2-21)
-	soldierSpawnChance = 15 // 15% chance to become soldier (22-36)
-	// Remaining 63% become workers (37-99)
+	queenSpawnChance   = 1  // 1% chance to become a queen (0)
+	nurseSpawnChance   = 20 // 20% chance to become nurse (1-20)
+	soldierSpawnChance = 15 // 15% chance to become soldier (21-35)
+	// Remaining 64% become workers (36-99)
 )
 
 // larvaeToAnt creates the appropriate adult ant based on a random roll

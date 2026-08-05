@@ -123,3 +123,20 @@ func RemoveNurse(colony *types.Colony, nurse *types.NurseAnt) {
 		}
 	}
 }
+
+// demoteHeir turns a queen who was passed over for the throne into an ordinary
+// worker or nurse, keeping her ID and position. A colony holds exactly one
+// queen, so an uncrowned heir has no role left to play and joins the workforce.
+func demoteHeir(world *types.World, colony *types.Colony, heir *types.QueenAnt) {
+	x, y := heir.Position.X, heir.Position.Y
+	RemoveAnt(world, heir)
+
+	var replacement types.AntInterface
+	if world.Rng.Below(100) < nurseSpawnChance {
+		replacement = SpawnNurseWithID(colony, heir.ID, x, y)
+	} else {
+		replacement = SpawnWorkerWithID(colony, heir.ID, x, y)
+	}
+	replacement.GetAnt().CurrentAction = "gave up the claim"
+	PlaceAnt(world, replacement)
+}

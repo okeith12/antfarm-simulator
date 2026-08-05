@@ -28,12 +28,13 @@ var (
 	layingThreshold   = 10 * types.FoodScale // Queen needs 10 food in store to lay
 
 	// The reigning queen wears out: she loses one health every this many ticks.
-	// Starting at 200 health that is a reign of roughly 6000 ticks, about 1.7
-	// hours at 1 Hz, after which an heir takes over. Heirs are rare (2% of
-	// larvae), so a queen who outlives her heirs leaves the colony queenless and
-	// it slowly winds down. Raise this for hardier dynasties, lower it for
-	// shorter, more frequent reigns.
-	queenDecayInterval = 30
+	// Starting at 200 health that is a reign of roughly 12000 ticks, about 3.3
+	// hours at 1 Hz, after which an heir takes over.
+	//
+	// Keep this under 100. Above that the health decay would outlast
+	// QueenMaxTick (20000) and the queen would simply die of old age instead,
+	// which makes the whole wearing-out mechanic decorative.
+	queenDecayInterval = 60
 )
 
 // updateColony handles all updates for a single colony
@@ -43,16 +44,13 @@ func updateColony(world *types.World, colony *types.Colony) {
 		colony.Queen.CurrentAction = "resting"
 	}
 
-	// The reigning queen ages and slowly wears down; heirs only age while they
-	// wait. This decay is what eventually hands the colony to a new queen.
+	// Only the reigning queen ages and wears down. Heirs are held in stasis
+	// until one of them is crowned, so waiting never costs them anything.
 	if colony.Queen != nil {
 		colony.Queen.Age++
 		if world.Ticks%queenDecayInterval == 0 {
 			colony.Queen.Health--
 		}
-	}
-	for _, heir := range colony.Queens {
-		heir.Age++
 	}
 
 	// Process deaths first (health <= 0 or old age)
@@ -226,15 +224,13 @@ func processDeaths(world *types.World, colony *types.Colony) {
 			colony.Queen = heir
 			colony.QueenPosition = heir.Position
 			heir.CurrentAction = "took the throne"
-		}
-	}
 
-	// Heirs can die of old age while they wait
-	for i := len(colony.Queens) - 1; i >= 0; i-- {
-		heir := colony.Queens[i]
-		if heir.IsDead() {
-			RemoveAnt(world, heir)
-			RemoveQueen(colony, heir)
+			// A colony keeps exactly one queen, so every heir who was not
+			// crowned gives up the claim and joins the workforce.
+			for _, passed := range colony.Queens {
+				demoteHeir(world, colony, passed)
+			}
+			colony.Queens = colony.Queens[:0]
 		}
 	}
 
