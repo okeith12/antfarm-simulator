@@ -37,7 +37,8 @@ func AddColony(world *types.World, colony *types.Colony) {
 		pos := nurse.Position
 		if world.IsValidPosition(pos.X, pos.Y) {
 			cell := world.GetCell(pos.X, pos.Y)
-			if cell.IsTunnel && cell.Occupant == nil {
+			cell.IsTunnel = true // founders arrive in fresh soil
+			if cell.Occupant == nil {
 				cell.Occupant = nurse
 			}
 		}
@@ -48,7 +49,8 @@ func AddColony(world *types.World, colony *types.Colony) {
 		pos := worker.Position
 		if world.IsValidPosition(pos.X, pos.Y) {
 			cell := world.GetCell(pos.X, pos.Y)
-			if cell.IsTunnel && cell.Occupant == nil {
+			cell.IsTunnel = true // founders arrive in fresh soil
+			if cell.Occupant == nil {
 				cell.Occupant = worker
 			}
 		}
@@ -59,7 +61,8 @@ func AddColony(world *types.World, colony *types.Colony) {
 		pos := soldier.Position
 		if world.IsValidPosition(pos.X, pos.Y) {
 			cell := world.GetCell(pos.X, pos.Y)
-			if cell.IsTunnel && cell.Occupant == nil {
+			cell.IsTunnel = true // founders arrive in fresh soil
+			if cell.Occupant == nil {
 				cell.Occupant = soldier
 			}
 		}

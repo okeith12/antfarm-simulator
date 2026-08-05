@@ -43,7 +43,7 @@ func NewWorld(width, height int, r *rng.Rng) *World {
 	// Scatter food on surface (top row)
 	for x := 0; x < width; x++ {
 		if r.Chance(10) { // 10% chance of food
-			cells[1*width+x].Food = 5 // Food pellet
+			cells[1*width+x].Food = 5 * FoodScale // Food pellet, 5 food
 		}
 	}
 

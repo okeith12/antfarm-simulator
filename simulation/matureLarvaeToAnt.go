@@ -7,9 +7,10 @@ import "antfarm/types"
 // Role spawn chances (out of 100)
 // Adjust these values to change the distribution of ant types
 const (
-	nurseSpawnChance   = 20 // 20% chance to become nurse (0-19)
-	soldierSpawnChance = 15 // 15% chance to become soldier (20-34)
-	// Remaining 65% become workers (35-99)
+	queenSpawnChance   = 5  // 5% chance to become a queen (0-4)
+	nurseSpawnChance   = 20 // 20% chance to become nurse (5-24)
+	soldierSpawnChance = 15 // 15% chance to become soldier (25-39)
+	// Remaining 60% become workers (40-99)
 )
 
 // larvaeToAnt creates the appropriate adult ant based on a random roll
@@ -18,13 +19,19 @@ func matureLarvaeToAnt(colony *types.Colony, larvae *types.LarvaeAnt, roll int) 
 	var newAnt types.AntInterface
 
 	switch {
-	case roll < nurseSpawnChance:
+	case roll < queenSpawnChance:
+		// Become a queen: takes the throne if vacant, otherwise an heir
+		queen := SpawnQueenWithID(colony, larvae.ID, larvae.Position.X, larvae.Position.Y)
+		queen.CurrentAction = "newly hatched"
+		newAnt = queen
+
+	case roll < queenSpawnChance+nurseSpawnChance:
 		// Become a nurse
 		nurse := SpawnNurseWithID(colony, larvae.ID, larvae.Position.X, larvae.Position.Y)
 		nurse.CurrentAction = "newly hatched"
 		newAnt = nurse
 
-	case roll < nurseSpawnChance+soldierSpawnChance:
+	case roll < queenSpawnChance+nurseSpawnChance+soldierSpawnChance:
 		// Become a soldier
 		soldier := SpawnSoldierWithID(colony, larvae.ID, larvae.Position.X, larvae.Position.Y)
 		soldier.CurrentAction = "newly hatched"

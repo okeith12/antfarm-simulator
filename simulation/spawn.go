@@ -52,6 +52,30 @@ func SpawnNurseWithID(colony *types.Colony, id int, x, y int) *types.NurseAnt {
 	return nurse
 }
 
+// SpawnQueenWithID creates a new queen with a specific ID (used when a larvae
+// matures into a queen). If the colony has no reigning queen she takes the
+// throne immediately; otherwise she joins the spares as an heir.
+func SpawnQueenWithID(colony *types.Colony, id int, x, y int) *types.QueenAnt {
+	queen := types.NewQueen(id, x, y, colony.Name)
+	if colony.Queen == nil {
+		colony.Queen = queen
+		colony.QueenPosition = types.Position{X: x, Y: y}
+	} else {
+		colony.Queens = append(colony.Queens, queen)
+	}
+	return queen
+}
+
+// RemoveQueen removes a spare queen from the colony's heirs
+func RemoveQueen(colony *types.Colony, queen *types.QueenAnt) {
+	for i, q := range colony.Queens {
+		if q.ID == queen.ID {
+			colony.Queens = append(colony.Queens[:i], colony.Queens[i+1:]...)
+			return
+		}
+	}
+}
+
 // SpawnLarvae creates a new larvae at the given position
 func SpawnLarvae(colony *types.Colony, x, y int) *types.LarvaeAnt {
 	larvae := types.NewLarvae(colony.NextAntID, x, y, colony.Name)

@@ -19,7 +19,8 @@ const (
 type Colony struct {
 	Name          string        // Colony identifier (e.g. "Red", "Black")
 	Color         ColonyColor   // Palette slot for this colony's ants
-	Queen         *QueenAnt     // The queen ant (center of the colony)
+	Queen         *QueenAnt     // The reigning queen (center of the colony)
+	Queens        []*QueenAnt   // Spare queens raised from larvae, heirs to the throne
 	HeadNurse     *NurseAnt     // The primary nurse ant (second in command)
 	Nurses        []*NurseAnt   // All other nurse ants
 	Workers       []*WorkerAnt  // All worker ants
@@ -32,23 +33,27 @@ type Colony struct {
 }
 
 // NewColony creates a new ant colony with a queen and head nurse at the specified position
-// Starts with initial food and spawns the queen and head nurse as the first ants
+// Every colony starts with the same three founders: one queen, one nurse to
+// tend her brood, and one worker so food starts arriving from the first tick.
+// Only the terrain and the dice vary between runs, never the opening lineup.
 func NewColony(name string, queenX, queenY int, color ColonyColor) *Colony {
 	queen := NewQueen(0, queenX, queenY, name)
-	headNurse := NewNurse(1, queenX+1, queenY, name) // Head nurse starts next to queen
+	headNurse := NewNurse(1, queenX+1, queenY, name)    // Head nurse starts next to queen
+	firstWorker := NewWorker(2, queenX-1, queenY, name) // First worker starts on her other side
 
 	return &Colony{
 		Name:          name,
 		Color:         color,
 		Queen:         queen,
 		HeadNurse:     headNurse,
+		Queens:        []*QueenAnt{},
 		Nurses:        []*NurseAnt{},
-		Workers:       []*WorkerAnt{},
+		Workers:       []*WorkerAnt{firstWorker},
 		Soldiers:      []*SoldierAnt{},
 		Larvae:        []*LarvaeAnt{},
-		Food:          50, // Starting food
+		Food:          50 * FoodScale, // Starting food, 50 food
 		Eggs:          0,
-		NextAntID:     2, // Start at 2 since queen=0, head nurse=1
+		NextAntID:     3, // Start at 3: queen=0, head nurse=1, first worker=2
 		QueenPosition: Position{queenX, queenY},
 	}
 }

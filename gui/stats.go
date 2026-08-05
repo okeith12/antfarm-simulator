@@ -25,7 +25,7 @@ func (r *Renderer) renderStats(world *types.World) {
 	y++
 	for _, colony := range world.Colonies {
 		colonyStats := fmt.Sprintf("%s Colony: %d ants | Food: %d | Eggs: %d | Larvae: %d",
-			colony.Name, colony.GetAntCount(), colony.Food, colony.Eggs, len(colony.Larvae))
+			colony.Name, colony.GetAntCount(), colony.Food/types.FoodScale, colony.Eggs, len(colony.Larvae))
 		style = tcell.StyleDefault.Foreground(ColonyColor(colony.Color)).Background(tcell.ColorDefault)
 		for i, ch := range colonyStats {
 			r.screen.SetContent(i, y, ch, nil, style)

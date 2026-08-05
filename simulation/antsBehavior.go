@@ -65,7 +65,7 @@ func workerBehavior(world *types.World, colony *types.Colony, worker *types.Work
 	currentCell := world.GetCell(worker.Position.X, worker.Position.Y)
 	if currentCell != nil && currentCell.Food > 0 {
 		worker.CarryingFood = true
-		worker.FoodAmount = 10
+		worker.FoodAmount = 10 * types.FoodScale
 		currentCell.Food = 0
 		worker.CurrentAction = "picked up food"
 		return
@@ -77,7 +77,7 @@ func workerBehavior(world *types.World, colony *types.Colony, worker *types.Work
 		// We'll use Food = -1 to mark harvested grass
 		if currentCell.Food >= 0 {
 			worker.CarryingFood = true
-			worker.FoodAmount = 5
+			worker.FoodAmount = 5 * types.FoodScale
 			currentCell.Food = -1 // Mark as harvested (no more grass)
 			worker.CurrentAction = "foraged grass"
 			return

@@ -4,6 +4,13 @@ package types
 // Each cell represents a single position in the 2D ant farm world and contains
 // information about terrain type, whether it's been dug into a tunnel, and what occupies it
 
+// FoodScale is how many internal food units make up one displayed food.
+//
+// Food is stored as a scaled integer rather than a float so the simulation
+// stays integer-only and ports directly to the firmware. A cost of one unit
+// therefore reads as 0.1 food.
+const FoodScale = 10
+
 // Soil represents different types of terrain in the world
 type Soil int
 

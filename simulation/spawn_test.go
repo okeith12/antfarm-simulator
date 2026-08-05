@@ -20,8 +20,9 @@ func TestSpawnWorker(t *testing.T) {
 	if colony.NextAntID != initialID+1 {
 		t.Error("NextAntID should increment")
 	}
-	if len(colony.Workers) != 1 {
-		t.Errorf("Expected 1 worker, got %d", len(colony.Workers))
+	// One founding worker already, so spawning adds a second.
+	if len(colony.Workers) != 2 {
+		t.Errorf("Expected 2 workers, got %d", len(colony.Workers))
 	}
 }
 
