@@ -1,16 +1,18 @@
 # AntFarm Simulator
 
 [![Platform](https://img.shields.io/badge/Platform-Terminal-black?style=flat&logo=gnometerminal)](https://github.com/gdamore/tcell)
-[![CI](https://github.com/okeith12/antfarm-simulator/actions/workflows/ci.yml/badge.svg?cache=false)](https://github.com/okeith12/antfarm/actions/workflows/ci.yml)
+[![CI](https://github.com/okeith12/antfarm-simulator/actions/workflows/ci.yml/badge.svg?cache=false)](https://github.com/okeith12/antfarm-simulator/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/github/v/tag/okeith12/antfarm-simulator?label=version)](https://github.com/okeith12/antfarm-simulator/releases)
 
-> **I am interested in becoming a digital Top G and this is just the start of my bionic ecosystem idea.** This ant simulator is v0 — the foundation for something much bigger. Next up: **Hardware-in-the-Loop (HWIL) ants** where physical MCUs run the ant brains while this simulator runs their world. Then comes the 3D printed ants. Join me on this journey from terminal ants to real-world bionic colonies. 
+> **I am interested in becoming a digital Top G and this is just the start of my bionic ecosystem idea.** This ant simulator is v0, the foundation for something much bigger. Next up: a small square panel you prop on a desk, where one pixel is one ant and the colony digs its own maze. After that, **Hardware-in-the-Loop (HWIL) ants** where physical MCUs run the ant brains while this simulator runs their world. Then the 3D printed ants.
 
 ---
 
-##  What Is This?
+## What Is This?
 
-A terminal-based ant colony simulator written in Go. Watch your colony as the queen lays eggs, nurses tend to larvae, and workers dig tunnels through procedurally generated terrain — all rendered in ASCII art using [tcell](https://github.com/gdamore/tcell).
+A terminal ant colony simulator in Go. The queen lays eggs, nurses tend larvae,
+workers dig tunnels and forage, and heirs eventually take the throne. All of it
+renders in ASCII through [tcell](https://github.com/gdamore/tcell).
 
 ```
 🌱🌱🌾🌱🌱🌱🌱🌱🌱🌱🌱🌱   <- Surface (food spawns here)
@@ -23,317 +25,212 @@ A terminal-based ant colony simulator written in Go. Watch your colony as the qu
 ```
 
 ---
-## Architecture Overview
 
-Here is the antchitecture overview
+## Getting Started
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                              TERMINAL                                    │
-│                         (tcell.Screen)                                   │
-└─────────────────────────────────────────────────────────────────────────┘
-                                   ▲
-                                   │ Render()
-                                   │
-┌─────────────────────────────────────────────────────────────────────────┐
-│                               gui/                                       │
-│  ┌─────────────────┐  ┌─────────────┐  ┌──────────────┐  ┌───────────┐ │
-│  │   renderer.go   │  │  stats.go   │  │ controls.go  │  │ colors.go │ │
-│  │                 │  │             │  │              │  │           │ │
-│  │ • Render()      │  │ • render    │  │ • render     │  │ • Color   │ │
-│  │ • ToggleLog()   │  │   Stats()   │  │   Controls() │  │   consts  │ │
-│  │                 │  │ • render    │  │              │  │           │ │
-│  │                 │  │   Activity  │  │              │  │           │ │
-│  │                 │  │   Log()     │  │              │  │           │ │
-│  └─────────────────┘  └─────────────┘  └──────────────┘  └───────────┘ │
-└─────────────────────────────────────────────────────────────────────────┘
-                                   ▲
-                                   │ reads
-                                   │
-┌─────────────────────────────────────────────────────────────────────────┐
-│                              types/                                      │
-│                                                                          │
-│  ┌─────────┐    ┌──────────────────────────────────────────────┐        │
-│  │  World  │───▶│                  Colony                       │        │
-│  │         │    │                                                │        │
-│  │ • Grid  │    │  ┌───────┐ ┌───────┐ ┌────────┐ ┌──────────┐ │        │
-│  │ • Width │    │  │ Queen │ │ Nurse │ │ Worker │ │ Soldier  │ │        │
-│  │ • Height│    │  │  ♛    │ │   ○   │ │   ●    │ │    ⚔     │ │        │
-│  │ • Ticks │    │  └───┬───┘ └───┬───┘ └───┬────┘ └────┬─────┘ │        │
-│  └────┬────┘    │      │         │         │           │        │        │
-│       │         │      └─────────┴─────────┴───────────┘        │        │
-│       │         │                    │                           │        │
-│       ▼         │              implements                        │        │
-│  ┌─────────┐    │                    ▼                           │        │
-│  │  Cell   │    │           ┌──────────────┐    ┌─────────┐     │        │
-│  │         │    │           │ AntInterface │    │ Larvae  │     │        │
-│  │ • Soil  │    │           │              │    │   ◦     │     │        │
-│  │ • Food  │    │           │ • GetAnt()   │    └─────────┘     │        │
-│  │ • Tunnel│    │           │ • GetIcon()  │                     │        │
-│  │ • Ant   │    │           │ • GetRole()  │                     │        │
-│  └─────────┘    │           └──────────────┘                     │        │
-│                 └──────────────────────────────────────────────┘        │
-└─────────────────────────────────────────────────────────────────────────┘
-                                   ▲
-                                   │ updates
-                                   │
-┌─────────────────────────────────────────────────────────────────────────┐
-│                              logic/                                      │
-│  ┌───────────────┐  ┌───────────────┐  ┌─────────────────┐              │
-│  │   world.go    │  │    ant.go     │  │ world_colony.go│              │
-│  │               │  │               │  │                 │              │
-│  │ • UpdateWorld │  │ • update      │  │ • AddColony()   │              │
-│  │ • updateColony│  │   Worker()    │  │ • PlaceAnt()    │              │
-│  │ • egg hatching│  │ • update      │  │ • RemoveAnt()   │              │
-│  │ • larvae grow │  │   Nurse()     │  │ • MoveWorldAnt()│              │
-│  └───────────────┘  └───────────────┘  └─────────────────┘              │
-│                                                                          │
-│  ┌─────────────────┐                                                    │
-│  │colony_ants.go│                                                    │
-│  │                 │                                                    │
-│  │ • SpawnWorker() │                                                    │
-│  │ • SpawnNurse()  │                                                    │
-│  │ • SpawnLarvae() │                                                    │
-│  │ • RemoveLarvae()│                                                    │
-│  └─────────────────┘                                                    │
-└─────────────────────────────────────────────────────────────────────────┘
-                                   │
-                                   │ uses
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           pathfinder/                                    │
-│  ┌─────────────────┐  ┌──────────────────┐  ┌────────────────────┐      │
-│  │  pathfinder.go  │  │workerpathfinder  │  │ nursepathfinder    │      │
-│  │                 │  │                  │  │                    │      │
-│  │ • Direction     │  │ • MoveRandomly() │  │ • GuardNursery()   │      │
-│  │ • CanMoveTo()   │  │ • BringFoodTo    │  │ • MoveTowardLarvae │      │
-│  │ • CanDigTo()    │  │   Queen()        │  │ • Queen swap logic │      │
-│  │ • MoveAnt()     │  │ • pickNewDir()   │  │                    │      │
-│  └─────────────────┘  └──────────────────┘  └────────────────────┘      │
-└─────────────────────────────────────────────────────────────────────────┘
+Requires Go 1.24+ and a terminal with UTF-8 and 256-colour support.
+
+```bash
+git clone https://github.com/okeith12/antfarm-simulator.git
+cd antfarm-simulator
+go mod tidy
+go run main.go
 ```
 
----
+Build a binary instead:
 
-## Project Structure
-
+```bash
+go build -o antfarm
+./antfarm
 ```
-antfarm/
-├── main.go                 # Entry point, game loop, event handling
-├── go.mod                  # Go module 
-├── go.sum                  
-│
-├── types/                  # the "whats"
-│   ├── world.go            # World struct
-│   ├── cell.go             # Individual grid cells (soil, tunnel, food)
-│   ├── colony.go           # Colony struct
-│   ├── ant.go              # Base Ant + AntInterface
-│   ├── queen.go            # Queen Ant - lays eggs
-│   ├── nurse.go            # Nurse Ant - tends larvae
-│   ├── worker.go           # Worker Ant - digs, forages
-│   ├── solider.go          # Soldier Ant - defends (WIP)
-│   ├── larvae.go           # Larvae - baby ants
-│   └── log.go              # Activity logging helper
-│
-├── simulation/             # the "how"
-│   ├── updateWorld.go      # UpdateWorld(), updateColony(), egg/larvae lifecycle
-│   ├── antsBehavior.go     # Ant behavior dispatchers
-│   ├── matureLarveToAnt.go # turn larvae into its desiginated ant
-│   ├── antPlacement.go     # AddColony(), PlaceAnt(), RemoveAnt(), MoveWorldAnt()
-│   └── spawn.go            # SpawnWorker(), SpawnNurse(), SpawnLarvae(), RemoveLarvae()
-│
-├── pathfinder/             # Movement and navigation
-│   ├── pathfinder.go       # Shared utilities, directions, movement
-│   ├── workerpathfinder.go # Worker-specific: random walk, food delivery
-│   └── nursepathfinder.go  # Nurse-specific: guard nursery, tend larvae
-│
-├── gui/                    # Terminal rendering
-|   ├── antfarm.go          # Main entrypoint and orchestrator 
-│   ├── renderer.go         # Render(), ToggleLog()
-│   ├── stats.go            # renderStats(), renderActivityLog()
-│   ├── controls.go         # renderControls()
-│   └── colors.go           # Color constants
-│
-└── util/                   # Helpers
-    └── abs.go              # Abs() for integers
-```
-
----
-
-## Simulation Flow
-
-```
-main.go
-   │
-   ├──▶ Initialize tcell.Screen
-   │
-   ├──▶ Create World (width × height grid)
-   │         │
-   │         └──▶ Generate terrain layers
-   │         └──▶ Scatter food on surface
-   │
-   ├──▶ Create Colony at position
-   │         │
-   │         ├──▶ Spawn Queen (ID: 0)
-   │         └──▶ Spawn Head Nurse (ID: 1)
-   │
-   └──▶ Game Loop
-            │
-            ├──▶ Handle Input (ESC/Q to quit, L to toggle log)
-            │
-            ├──▶ Simulation Tick (1 Hz default)
-            │         │
-            │         └──▶ logic.UpdateWorld()
-            │                   │
-            │                   ├──▶ Queen lays eggs (if enough food)
-            │                   ├──▶ Eggs hatch into Larvae
-            │                   ├──▶ Larvae + NurseCare → Workers
-            │                   ├──▶ Update each Nurse behavior
-            │                   ├──▶ Update each Worker behavior
-            │                   └──▶ Update each Soldier behavior
-            │
-            └──▶ Render (30 FPS)
-                      │
-                      └──▶ gui.Renderer.Render()
-                                │
-                                ├──▶ Draw terrain grid
-                                ├──▶ Draw ants with role icons
-                                ├──▶ Draw stats bar
-                                └──▶ Draw activity log
-```
-
----
-
-##  Ant Roles & Behaviors
-
-| Role | Icon | Behavior |
-|------|------|----------|
-| **Queen** | ♛ | Stays in chamber. Lays 1-5 eggs every 50 ticks (costs 10 food each). |
-| **Nurse** | ○ | Guards nursery near queen. When larvae spawn, moves to them and provides care until they mature into workers. |
-| **Worker** | ● | Explores randomly using "tryna be" ant like movement. Digs tunnels through sand. Forages food from surface and delivers to queen. |
-| **Soldier** | ⚔ | Patrols (WIP - combat not implemented yet). |
-| **Larvae** | ◦ | Waits for nurse care. After receiving care + 50 ticks of age → becomes Worker. |
 
 ---
 
 ## Controls
 
+All of these work.
+
 | Key | Action |
-|-----|--------|
-| `Q` / `ESC` | Quit simulation |
-| `L` | Toggle activity log |
-| `Ctrl+>` | Speed up (not yet implemented) |
-| `Ctrl+<` | Slow down (not yet implemented) |
-| `P` | Pause (not yet implemented) |
+|---|---|
+| `Q` / `ESC` | Quit |
+| `L` | Toggle the activity log |
+| `P` | Pause and resume |
+| `+` / `=` | Speed up |
+| `-` | Slow down |
+
+Six speed presets, from 0.25x to 10x: `0.25, 0.5, 1, 2, 5, 10` ticks per second.
+Rendering stays at 30 FPS independently of simulation speed.
 
 ---
 
-## Getting Started
+## Ant Roles
 
-### Prerequisites
+| Role | Icon | Behaviour |
+|---|---|---|
+| **Queen** | ♛ | Stays in her chamber and lays one egg every 50 ticks, costing 0.1 food. Does not age. |
+| **Nurse** | ○ | Guards the nursery, moves to larvae and tends them until they mature. |
+| **Worker** | ● | Wanders with directional momentum, digs tunnels, forages the surface and carries food back. |
+| **Soldier** | ⚔ | Patrols. Combat is not implemented. |
+| **Larva** | ◦ | Waits for a nurse. With care and 50 ticks of age it matures into an adult. |
 
-- Go 1.21 or higher
-- A terminal with UTF-8 and 256-color support
+When a larva matures it rolls for a caste: **1% queen, 20% nurse, 15% soldier,
+64% worker.**
 
-### Installation
+### Succession
+
+A colony holds exactly one reigning queen, and **can never go queenless.** That
+is structural rather than lucky:
+
+- A queen does not age and is immortal
+- She only begins losing health once she has borne an heir
+- Heirs do not age and cannot die while they wait
+
+So a queen is only mortal while an heir exists to replace her. When she dies the
+longest-waiting heir is crowned where she stands, the colony centre moves with
+her, and any other heirs give up the claim and become workers or nurses.
+
+---
+
+## Architecture
+
+Full detail in **[ARCHITECTURE.md](ARCHITECTURE.md)**. The short version:
+
+**The simulation core knows nothing about the display.**
+
+```
+gui/  ────uses────>  simulation/  ────uses────>  pathfinder/  ───>  types/
+                                                                      ^
+                                                                      |
+                                              nothing here imports tcell
+```
+
+That arrow never reverses, and it is checkable:
 
 ```bash
-# Clone the repository
-git clone https://github.com/okeith12/antfarm.git
-cd antfarm
-
-# Download dependencies
-go mod tidy
-
-# Run the simulation
-go run main.go
+grep -rn "tcell" types simulation pathfinder util rng main.go   # returns nothing
 ```
 
-### Build
+The reason is where this is going. The same simulation has to run on a
+microcontroller driving an SPI panel, where no terminal library exists. Anything
+the core knows about rendering is something that has to be torn out later.
 
-```bash
-# Build binary
-go build -o antfarm
-
-# Run
-./antfarm
-```
-When I actually get somewhere with this then you can 
-Download the latest release for your platform from the [Releases](https://github.com/okeith12/antfarm/releases) page.
-
-**macOS / Linux:**
-
-```bash
-# Make it executable
-chmod +x antfarm
-
-# Run it
-./antfarm
-```
-
-**Windows:**
+### Project structure
 
 ```
-antfarm.exe
+antfarm/
+├── main.go              # Entry point
+│
+├── types/               # The nouns
+│   ├── world.go         # World, flat row-major grid
+│   ├── cell.go          # Cell, Soil, FoodScale
+│   ├── colony.go        # Colony, ColonyColor
+│   ├── ant.go           # Base Ant + AntInterface, lifespans, health
+│   ├── queen.go         # QueenAnt, including the Declining flag
+│   ├── nurse.go  worker.go  solider.go  larvae.go
+│   └── log.go
+│
+├── simulation/          # The verbs (declares `package logic`)
+│   ├── updateWorld.go       # One tick, deaths, laying, hatching, succession
+│   ├── antsBehavior.go      # Per-role behaviour
+│   ├── antPlacement.go      # AddColony, PlaceAnt, RemoveAnt, MoveWorldAnt
+│   ├── spawn.go             # Spawning, removal, heir demotion
+│   └── matureLarvaeToAnt.go # The caste roll
+│
+├── pathfinder/          # Movement
+│   ├── pathfinder.go        # Directions, CanMoveTo, CanDigTo, Move, DigAndMove
+│   ├── workerpathfinder.go  # Random walk with momentum, food delivery
+│   └── nursepathfinder.go   # Guard nursery, move to larvae, queen swap
+│
+├── gui/                 # Terminal rendering, the only package that sees tcell
+│   ├── antfarm.go       # Game loop, input, speed and pause
+│   └── renderer.go  stats.go  controls.go  colors.go
+│
+├── rng/                 # Deterministic xorshift32
+└── util/                # Abs()
 ```
+
+**Naming trap:** the `simulation/` directory declares `package logic`, left over
+from a rename. Import it as `logic "antfarm/simulation"`.
+
+### Two decisions that shape everything
+
+**Food is a scaled integer, never a float.** `types.FoodScale = 10`, so food is
+counted internally in tenths and the stats bar divides on the way out. Floats are
+avoided because the firmware port must produce bit-identical results from the
+same seed, and float arithmetic does not survive that across compilers and
+architectures.
+
+**Randomness is injected, never global.** Nothing calls `math/rand`. The
+generator is xorshift32, held on the World:
+
+```go
+world := types.NewWorld(120, 35, rng.New(seed))
+```
+
+The app seeds from the clock so every run differs. Tests pass fixed seeds. Same
+seed, same colony, always. That reproducibility is what will let the Go and C
+implementations be diffed against each other.
+
 ---
 
 ## Configuration
 
-Key constants in `main.go`:
+Simulation speed and frame rate, `gui/antfarm.go`:
 
 ```go
-const (
-    simulationUpdatesPerSecond = 1   // Simulation speed 
-    renderFPS                  = 30  // Frames per second
-)
+var speedPresets = []float64{0.25, 0.5, 1, 2, 5, 10}
+const renderFPS = 30
 ```
 
-Key timing in `logic/world.go`:
+Timing and cost, `simulation/updateWorld.go`:
 
 ```go
-var (
-    eggLayingInterval = 50  // Ticks between egg batches
-    eggHatchTime      = 30  // Ticks for egg → larvae
-    larvaeGrowTime    = 50  // Ticks for larvae → worker (with nurse care)
-)
+eggLayingInterval    = 50   // ticks between eggs
+eggHatchTime         = 30   // ticks per hatch, one egg at a time
+larvaeGrowTime       = 50   // nursed growth before maturing
+foodCost             = 1    // food units per egg, so 0.1 food
+layingThreshold      = 100  // store needed to lay, so 10 food
+queenDeclineInterval = 30   // ticks per health point once declining
 ```
 
 ---
 
-## 🗺️ Roadmap
+## Testing
 
-### v0.1 - Current
-- [x] Basic world generation
-- [x] Queen egg-laying cycle
-- [x] Nurse-larvae care system
-- [x] Worker digging & foraging
-- [x] Terminal rendering with tcell
-- [ ] Activity logging system
+```bash
+go test ./...     # 111 tests across 6 packages
+```
 
-- [ ] Study Ant behavior and read up on them to further ehance the simulator
-
-### v0.2 - Planned SUbjected to change, 
-- [ ] Multiple colonies with different colors
-- [ ] Soldier patrol and combat
-- [ ] Pheromone trail system
-- [ ] Food scent detection
-- [ ] Colony statistics dashboard
-
-### v1.0 - HWIL Integration YASSSSSS
-- [ ] Serial/BLE protocol for external MCU ants
-- [ ] Sensor simulation (what the ant "sees")
-- [ ] Action parsing (movement commands from MCU)
-- [ ] Mixed simulation: software + hardware ants
-
-### v2.0 - Physical 
-- [ ] 3D printable ant robot designs
-- [ ] ESP32/nRF firmware templates
-- [ ] Real-world ↔ simulation bridge
+Everything is deterministic, so a flaky test here means a real bug rather than
+bad luck. Two properties matter most: `rng` proves that one seed always gives one
+sequence, and `TestSameSeedProducesSameColony` runs 500 ticks twice on a single
+seed and compares the whole colony.
 
 ---
 
-##  Contributing
+## Known Problems
+
+Detail in **[LIFECYCLE-AUDIT.md](LIFECYCLE-AUDIT.md)**. In short: foraging is a
+blind random walk so workers spend most of their lives wandering, the world's
+food is finite and never regenerates, and eggs hatch one per 30 ticks no matter
+how many are queued. Known and accepted at v0.
+
+---
+
+## Roadmap
+
+`WHATNEXT.md` has the long list. The direction:
+
+- **v0, here now.** Terminal. Queen cycle, nursing, digging, foraging, succession.
+- **v0.1.** A small square panel on the desk. One pixel per ant, the colony digs
+  its own maze, and you watch it like a toy.
+- **v1.** Hardware in the loop. Physical MCUs run ant brains, the simulator runs
+  their world.
+- **v2.** 3D printed ant bodies.
+
+---
+
+## Contributing
 
 This project is the foundation for a larger bionic ecosystem experiment. If you're interested...
 ...dont be...justkidding...
@@ -349,9 +246,9 @@ I mean I just put my go code together that anyone can do so do whatever you want
 
 ## Acknowledgments
 
-- [tcell](https://github.com/gdamore/tcell) - Terminal cell library for Go
-- Real ants - for being fascinating little engineers
-- Myself - for completing a projct
+- [tcell](https://github.com/gdamore/tcell), terminal cell library for Go
+- Real ants, for being fascinating little engineers
+- Myself, for completing a projct
 
 ---
 
