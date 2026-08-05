@@ -26,6 +26,14 @@ var (
 	larvaeGrowTime    = 50                   // Larvae become workers after 50 ticks with nurse care
 	foodCost          = 1                    // Cost per egg, in food units (0.1 food)
 	layingThreshold   = 10 * types.FoodScale // Queen needs 10 food in store to lay
+
+	// The reigning queen wears out: she loses one health every this many ticks.
+	// Starting at 200 health that is a reign of roughly 6000 ticks, about 1.7
+	// hours at 1 Hz, after which an heir takes over. Heirs are rare (2% of
+	// larvae), so a queen who outlives her heirs leaves the colony queenless and
+	// it slowly winds down. Raise this for hardier dynasties, lower it for
+	// shorter, more frequent reigns.
+	queenDecayInterval = 30
 )
 
 // updateColony handles all updates for a single colony
@@ -35,23 +43,33 @@ func updateColony(world *types.World, colony *types.Colony) {
 		colony.Queen.CurrentAction = "resting"
 	}
 
+	// The reigning queen ages and slowly wears down; heirs only age while they
+	// wait. This decay is what eventually hands the colony to a new queen.
+	if colony.Queen != nil {
+		colony.Queen.Age++
+		if world.Ticks%queenDecayInterval == 0 {
+			colony.Queen.Health--
+		}
+	}
+	for _, heir := range colony.Queens {
+		heir.Age++
+	}
+
 	// Process deaths first (health <= 0 or old age)
 	processDeaths(world, colony)
 
-	// Queen lays 1-5 eggs periodically
-	if world.Ticks > 0 && world.Ticks%eggLayingInterval == 0 && colony.Food >= layingThreshold {
+	// The queen lays a single egg periodically. A queenless colony lays nothing:
+	// it lives on whatever brood and workers it already has.
+	if colony.Queen != nil && world.Ticks > 0 && world.Ticks%eggLayingInterval == 0 &&
+		colony.Food >= layingThreshold {
 		// One egg per laying event, paid for up front
 		if colony.Food >= foodCost {
 			colony.Eggs++
 			colony.Food -= foodCost
-			if colony.Queen != nil {
-				colony.Queen.TotalEggsLaid++
-			}
+			colony.Queen.TotalEggsLaid++
 		}
 
-		if colony.Queen != nil {
-			colony.Queen.CurrentAction = "laying eggs"
-		}
+		colony.Queen.CurrentAction = "laying eggs"
 	}
 
 	// Eggs hatch into larvae
@@ -195,11 +213,29 @@ func findEmptySpawnPosition(world *types.World, queenPos types.Position) (int, i
 // processDeaths checks all ants for death conditions and removes dead ants
 // Ants die from: health <= 0 (exhaustion/damage) or age >= maxAge (old age)
 func processDeaths(world *types.World, colony *types.Colony) {
-	// Check queen death
+	// Check queen death, then hand the throne to the longest-waiting heir.
+	// She is crowned where she stands, so the colony's centre moves with her.
+	// With no heir the colony is queenless and lays no more eggs.
 	if colony.Queen != nil && colony.Queen.IsDead() {
 		RemoveAnt(world, colony.Queen)
 		colony.Queen = nil
-		// TODO: Colony collapse when queen dies? (Phase 2)
+
+		if len(colony.Queens) > 0 {
+			heir := colony.Queens[0]
+			colony.Queens = colony.Queens[1:]
+			colony.Queen = heir
+			colony.QueenPosition = heir.Position
+			heir.CurrentAction = "took the throne"
+		}
+	}
+
+	// Heirs can die of old age while they wait
+	for i := len(colony.Queens) - 1; i >= 0; i-- {
+		heir := colony.Queens[i]
+		if heir.IsDead() {
+			RemoveAnt(world, heir)
+			RemoveQueen(colony, heir)
+		}
 	}
 
 	// Check head nurse death

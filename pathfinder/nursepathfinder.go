@@ -62,8 +62,10 @@ func (np *NursePathfinder) MoveTowardTarget(world *types.World, colony *types.Co
 			continue
 		}
 
-		// If it's the queen's cell, swap positions with queen
-		if newX == colony.QueenPosition.X && newY == colony.QueenPosition.Y {
+		// If it's the queen's cell, swap positions with queen.
+		// A queenless colony still remembers where her chamber was, so check she
+		// actually exists before trying to move her out of the way.
+		if colony.Queen != nil && newX == colony.QueenPosition.X && newY == colony.QueenPosition.Y {
 			// Swap: nurse goes to queen's spot, queen goes to nurse's spot
 			queenCell := world.GetCell(colony.QueenPosition.X, colony.QueenPosition.Y)
 			nurseCell := world.GetCell(curX, curY)
