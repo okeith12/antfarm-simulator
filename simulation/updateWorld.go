@@ -27,14 +27,11 @@ var (
 	foodCost          = 1                    // Cost per egg, in food units (0.1 food)
 	layingThreshold   = 10 * types.FoodScale // Queen needs 10 food in store to lay
 
-	// The reigning queen wears out: she loses one health every this many ticks.
-	// Starting at 200 health that is a reign of roughly 12000 ticks, about 3.3
-	// hours at 1 Hz, after which an heir takes over.
-	//
-	// Keep this under 100. Above that the health decay would outlast
-	// QueenMaxTick (20000) and the queen would simply die of old age instead,
-	// which makes the whole wearing-out mechanic decorative.
-	queenDecayInterval = 60
+	// A queen does not age and is immortal until she bears an heir. That birth
+	// starts a slow decline: from then on she loses one health every this many
+	// ticks. Starting at 200 health that is a 6000 tick twilight, roughly 1.7
+	// hours at 1 Hz, before the heir is crowned.
+	queenDeclineInterval = 30
 )
 
 // updateColony handles all updates for a single colony
@@ -44,13 +41,13 @@ func updateColony(world *types.World, colony *types.Colony) {
 		colony.Queen.CurrentAction = "resting"
 	}
 
-	// Only the reigning queen ages and wears down. Heirs are held in stasis
-	// until one of them is crowned, so waiting never costs them anything.
-	if colony.Queen != nil {
-		colony.Queen.Age++
-		if world.Ticks%queenDecayInterval == 0 {
+	// Neither the reigning queen nor her heirs age. A queen who has borne an
+	// heir is on the way out, and only then does she start losing health.
+	if colony.Queen != nil && colony.Queen.Declining {
+		if world.Ticks%queenDeclineInterval == 0 {
 			colony.Queen.Health--
 		}
+		colony.Queen.CurrentAction = "fading"
 	}
 
 	// Process deaths first (health <= 0 or old age)

@@ -4,9 +4,10 @@ package types
 // The queen is the heart of the colony, responsible for laying eggs
 
 type QueenAnt struct {
-	*Ant                  // Embedded base ant
-	EggLayingCooldown int // Ticks until queen can lay another egg
-	TotalEggsLaid     int // Lifetime egg count
+	*Ant                   // Embedded base ant
+	EggLayingCooldown int  // Ticks until queen can lay another egg
+	TotalEggsLaid     int  // Lifetime egg count
+	Declining         bool // Set once she has borne an heir; she then starts losing health
 }
 
 // NewQueen creates a new queen ant at the specified position
@@ -18,6 +19,7 @@ func NewQueen(id int, x, y int, colonyID string) *QueenAnt {
 		Ant:               ant,
 		EggLayingCooldown: 0,
 		TotalEggsLaid:     0,
+		Declining:         false,
 	}
 }
 

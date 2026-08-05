@@ -54,15 +54,20 @@ func SpawnNurseWithID(colony *types.Colony, id int, x, y int) *types.NurseAnt {
 
 // SpawnQueenWithID creates a new queen with a specific ID (used when a larvae
 // matures into a queen). If the colony has no reigning queen she takes the
-// throne immediately; otherwise she joins the spares as an heir.
+// throne immediately; otherwise she joins the heirs in waiting.
+//
+// A queen is immortal until she bears an heir. That birth starts her slow
+// decline, and from then on she loses health until an heir takes over.
 func SpawnQueenWithID(colony *types.Colony, id int, x, y int) *types.QueenAnt {
 	queen := types.NewQueen(id, x, y, colony.Name)
 	if colony.Queen == nil {
 		colony.Queen = queen
 		colony.QueenPosition = types.Position{X: x, Y: y}
-	} else {
-		colony.Queens = append(colony.Queens, queen)
+		return queen
 	}
+
+	colony.Queens = append(colony.Queens, queen)
+	colony.Queen.Declining = true
 	return queen
 }
 
