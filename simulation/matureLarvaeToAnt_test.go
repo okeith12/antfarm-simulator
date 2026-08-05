@@ -17,12 +17,12 @@ func TestLarvaeToAnt_RoleSelection(t *testing.T) {
 		expectedTyp string
 	}{
 		{"Queen lower bound", 0, "*types.QueenAnt"},
-		{"Queen upper bound", 4, "*types.QueenAnt"},
-		{"Nurse lower bound", 5, "*types.NurseAnt"},
-		{"Nurse upper bound", 24, "*types.NurseAnt"},
-		{"Soldier lower bound", 25, "*types.SoldierAnt"},
-		{"Soldier upper bound", 39, "*types.SoldierAnt"},
-		{"Worker lower bound", 40, "*types.WorkerAnt"},
+		{"Queen upper bound", 1, "*types.QueenAnt"},
+		{"Nurse lower bound", 2, "*types.NurseAnt"},
+		{"Nurse upper bound", 21, "*types.NurseAnt"},
+		{"Soldier lower bound", 22, "*types.SoldierAnt"},
+		{"Soldier upper bound", 36, "*types.SoldierAnt"},
+		{"Worker lower bound", 37, "*types.WorkerAnt"},
 		{"Worker upper bound", 99, "*types.WorkerAnt"},
 	}
 
