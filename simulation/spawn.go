@@ -4,7 +4,7 @@ import (
 	"antfarm/types"
 )
 
-// spawnant.go -  ant spawning logic
+// spawn.go -  ant spawning logic
 // Handles ant lifecycle management within a colony
 
 // SpawnWorker creates a new worker ant at the given position

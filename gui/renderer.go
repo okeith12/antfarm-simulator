@@ -68,7 +68,7 @@ func (r *Renderer) Render(world *types.World, paused bool, speed float64) {
 				// Find the ant's colony to get its color
 				for _, colony := range world.Colonies {
 					if colony.Name == cell.Occupant.GetAnt().ColonyID {
-						fgColor = colony.Color
+						fgColor = ColonyColor(colony.Color)
 						break
 					}
 				}
@@ -77,7 +77,7 @@ func (r *Renderer) Render(world *types.World, paused bool, speed float64) {
 				if cell.IsTunnel {
 					bgColor = tcell.ColorDefault
 				} else {
-					bgColor = cell.GetColor()
+					bgColor = SoilColor(cell.Soil, cell.IsTunnel)
 				}
 			} else {
 				// No ant - draw the terrain

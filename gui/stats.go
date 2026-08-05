@@ -26,7 +26,7 @@ func (r *Renderer) renderStats(world *types.World) {
 	for _, colony := range world.Colonies {
 		colonyStats := fmt.Sprintf("%s Colony: %d ants | Food: %d | Eggs: %d | Larvae: %d",
 			colony.Name, colony.GetAntCount(), colony.Food, colony.Eggs, len(colony.Larvae))
-		style = tcell.StyleDefault.Foreground(colony.Color).Background(tcell.ColorDefault)
+		style = tcell.StyleDefault.Foreground(ColonyColor(colony.Color)).Background(tcell.ColorDefault)
 		for i, ch := range colonyStats {
 			r.screen.SetContent(i, y, ch, nil, style)
 		}
@@ -76,7 +76,7 @@ func (r *Renderer) renderActivityLog(world *types.World, startY int) {
 			logLine := fmt.Sprintf("%s_%s_Ant_%d is %s at (%d,%d)",
 				colony.Name, roleStr, baseAnt.ID, action, baseAnt.Position.X, baseAnt.Position.Y)
 
-			style := tcell.StyleDefault.Foreground(colony.Color).Background(tcell.ColorDefault)
+			style := tcell.StyleDefault.Foreground(ColonyColor(colony.Color)).Background(tcell.ColorDefault)
 			for i, ch := range logLine {
 				r.screen.SetContent(i, y, ch, nil, style)
 			}

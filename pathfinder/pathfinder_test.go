@@ -1,6 +1,7 @@
 package pathfinder
 
 import (
+	"antfarm/rng"
 	"antfarm/types"
 	"testing"
 )
@@ -104,7 +105,7 @@ func TestManhattanDistance(t *testing.T) {
 }
 
 func TestCanMoveTo(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	world.Grid[5][5].IsTunnel = true
 
 	if !CanMoveTo(world, 5, 5) {
@@ -119,7 +120,7 @@ func TestCanMoveTo(t *testing.T) {
 }
 
 func TestCanDigTo(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	world.Grid[10][10].Soil = types.Rock
 
 	if !CanDigTo(world, 5, 5) {
@@ -134,7 +135,7 @@ func TestCanDigTo(t *testing.T) {
 }
 
 func TestMove(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	world.Grid[5][5].IsTunnel = true
 	world.Grid[5][6].IsTunnel = true
 
@@ -152,7 +153,7 @@ func TestMove(t *testing.T) {
 }
 
 func TestDigAndMove(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	world.Grid[5][5].IsTunnel = true
 
 	worker := types.NewWorker(1, 5, 5, "Red")
@@ -172,7 +173,7 @@ func TestDigAndMove(t *testing.T) {
 }
 
 func TestDigAndMoveHealthCost(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	world.Grid[5][5].IsTunnel = true
 
 	worker := types.NewWorker(1, 5, 5, "Red")
@@ -188,7 +189,7 @@ func TestDigAndMoveHealthCost(t *testing.T) {
 }
 
 func TestDigAndMoveMultipleDigsReduceHealth(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 
 	// Create a tunnel starting point
 	world.Grid[5][5].IsTunnel = true
@@ -210,7 +211,7 @@ func TestDigAndMoveMultipleDigsReduceHealth(t *testing.T) {
 }
 
 func TestDigAndMoveFail(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	world.Grid[5][5].IsTunnel = true
 	world.Grid[5][6].Soil = types.Rock
 

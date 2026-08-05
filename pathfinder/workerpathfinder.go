@@ -2,7 +2,6 @@ package pathfinder
 
 import (
 	"antfarm/types"
-	"math/rand"
 )
 
 // WorkerPathfinder handles movement logic for worker ants
@@ -50,7 +49,7 @@ func (wp *WorkerPathfinder) pickNewDirection(world *types.World, worker *types.W
 	directions := GetCardinalDirections()
 
 	// Shuffle for randomness
-	rand.Shuffle(len(directions), func(i, j int) {
+	world.Rng.Shuffle(len(directions), func(i, j int) {
 		directions[i], directions[j] = directions[j], directions[i]
 	})
 
@@ -70,7 +69,7 @@ func (wp *WorkerPathfinder) pickNewDirection(world *types.World, worker *types.W
 		if CanMoveTo(world, newX, newY) || CanDigTo(world, newX, newY) {
 			// Set new direction with random momentum (3-6 moves)
 			worker.CurrentDirection = int(dir)
-			worker.MovesInDirection = rand.Intn(4) + 3
+			worker.MovesInDirection = int(world.Rng.Below(4)) + 3
 			worker.MovesMade = 0
 
 			if CanMoveTo(world, newX, newY) {
@@ -91,7 +90,7 @@ func (wp *WorkerPathfinder) pickNewDirection(world *types.World, worker *types.W
 
 		if CanMoveTo(world, newX, newY) {
 			worker.CurrentDirection = int(oppositeDir)
-			worker.MovesInDirection = rand.Intn(4) + 3
+			worker.MovesInDirection = int(world.Rng.Below(4)) + 3
 			worker.MovesMade = 0
 			Move(world, worker, newX, newY)
 			worker.MovesMade++

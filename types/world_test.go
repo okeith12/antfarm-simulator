@@ -1,9 +1,12 @@
 package types
 
-import "testing"
+import (
+	"antfarm/rng"
+	"testing"
+)
 
 func TestNewWorld(t *testing.T) {
-	world := NewWorld(80, 40)
+	world := NewWorld(80, 40, rng.New(1))
 
 	if world.Width != 80 {
 		t.Errorf("Expected Width 80, got %d", world.Width)
@@ -23,7 +26,7 @@ func TestNewWorld(t *testing.T) {
 }
 
 func TestWorldIsValidPosition(t *testing.T) {
-	world := NewWorld(80, 40)
+	world := NewWorld(80, 40, rng.New(1))
 
 	if !world.IsValidPosition(0, 0) {
 		t.Error("(0,0) should be valid")
@@ -43,7 +46,7 @@ func TestWorldIsValidPosition(t *testing.T) {
 }
 
 func TestGetCell(t *testing.T) {
-	world := NewWorld(80, 40)
+	world := NewWorld(80, 40, rng.New(1))
 
 	cell := world.GetCell(10, 5)
 	if cell == nil {

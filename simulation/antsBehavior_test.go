@@ -1,15 +1,14 @@
 package logic
 
 import (
+	"antfarm/rng"
 	"antfarm/types"
 	"testing"
-
-	"github.com/gdamore/tcell/v2"
 )
 
 func TestUpdateWorkerAges(t *testing.T) {
-	world := types.NewWorld(40, 30)
-	colony := types.NewColony("Red", 20, 15, tcell.ColorRed)
+	world := types.NewWorld(40, 30, rng.New(1))
+	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
 	worker := SpawnWorker(colony, 20, 14)
@@ -26,8 +25,8 @@ func TestUpdateWorkerAges(t *testing.T) {
 }
 
 func TestUpdateSoldierAges(t *testing.T) {
-	world := types.NewWorld(40, 30)
-	colony := types.NewColony("Red", 20, 15, tcell.ColorRed)
+	world := types.NewWorld(40, 30, rng.New(1))
+	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
 	soldier := SpawnSoldier(colony, 20, 14)
@@ -44,8 +43,8 @@ func TestUpdateSoldierAges(t *testing.T) {
 }
 
 func TestUpdateNurseAges(t *testing.T) {
-	world := types.NewWorld(40, 30)
-	colony := types.NewColony("Red", 20, 15, tcell.ColorRed)
+	world := types.NewWorld(40, 30, rng.New(1))
+	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
 	initialAge := colony.HeadNurse.Age
@@ -58,8 +57,8 @@ func TestUpdateNurseAges(t *testing.T) {
 }
 
 func TestWorkerPicksUpFood(t *testing.T) {
-	world := types.NewWorld(40, 30)
-	colony := types.NewColony("Red", 20, 15, tcell.ColorRed)
+	world := types.NewWorld(40, 30, rng.New(1))
+	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
 	worker := SpawnWorker(colony, 10, 1)
@@ -74,8 +73,8 @@ func TestWorkerPicksUpFood(t *testing.T) {
 }
 
 func TestWorkerDepositsFood(t *testing.T) {
-	world := types.NewWorld(40, 30)
-	colony := types.NewColony("Red", 20, 15, tcell.ColorRed)
+	world := types.NewWorld(40, 30, rng.New(1))
+	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
 	// Place worker adjacent to queen with food
@@ -98,8 +97,8 @@ func TestWorkerDepositsFood(t *testing.T) {
 }
 
 func TestLarvaeAges(t *testing.T) {
-	world := types.NewWorld(40, 30)
-	colony := types.NewColony("Red", 20, 15, tcell.ColorRed)
+	world := types.NewWorld(40, 30, rng.New(1))
+	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 	AddColony(world, colony)
 
 	larvae := SpawnLarvae(colony, 21, 15)

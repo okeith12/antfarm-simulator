@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"antfarm/rng"
 	logic "antfarm/simulation"
 	"antfarm/types"
 	"testing"
@@ -20,10 +21,10 @@ func mockScreen() tcell.SimulationScreen {
 // mockAntfarm creates an Antfarm using a simulation screen for testing.
 func mockAntfarm(screen tcell.SimulationScreen) *Antfarm {
 	width, height := screen.Size()
-	world := types.NewWorld(width, height-5)
+	world := types.NewWorld(width, height-5, rng.New(1))
 
 	queenX, queenY := width/4, height/3
-	colony := types.NewColony("Red", queenX, queenY, tcell.ColorRed)
+	colony := types.NewColony("Red", queenX, queenY, types.ColonyRed)
 	logic.AddColony(world, colony)
 
 	renderer := NewRenderer(screen)

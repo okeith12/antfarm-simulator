@@ -1,10 +1,9 @@
 package pathfinder
 
 import (
+	"antfarm/rng"
 	"antfarm/types"
 	"testing"
-
-	"github.com/gdamore/tcell/v2"
 )
 
 func TestNewNursePathfinder(t *testing.T) {
@@ -31,10 +30,10 @@ func TestNurseIsAdjacentToLarvae(t *testing.T) {
 }
 
 func TestNurseGuardNursery(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	np := NewNursePathfinder()
 
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 
 	// Create tunnels around queen
 	for x := 8; x <= 12; x++ {
@@ -54,10 +53,10 @@ func TestNurseGuardNursery(t *testing.T) {
 }
 
 func TestNurseGuardNurseryMovesCloser(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	np := NewNursePathfinder()
 
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 
 	// Create tunnels
 	for x := 5; x <= 15; x++ {
@@ -78,10 +77,10 @@ func TestNurseGuardNurseryMovesCloser(t *testing.T) {
 }
 
 func TestNurseMoveTowardQueen(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	np := NewNursePathfinder()
 
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 
 	// Create tunnels
 	for x := 5; x <= 15; x++ {
@@ -100,10 +99,10 @@ func TestNurseMoveTowardQueen(t *testing.T) {
 }
 
 func TestNurseMoveTowardLarvae(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	np := NewNursePathfinder()
 
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 
 	// Create tunnels
 	for x := 5; x <= 15; x++ {

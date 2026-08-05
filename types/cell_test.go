@@ -2,8 +2,6 @@ package types
 
 import (
 	"testing"
-
-	"github.com/gdamore/tcell/v2"
 )
 
 func TestNewCell(t *testing.T) {
@@ -20,28 +18,6 @@ func TestNewCell(t *testing.T) {
 	}
 	if cell.Food != 0 {
 		t.Errorf("Expected Food 0, got %d", cell.Food)
-	}
-}
-
-func TestGetColor(t *testing.T) {
-	tests := []struct {
-		soil     Soil
-		isTunnel bool
-		expected tcell.Color
-	}{
-		{Sand, false, tcell.ColorYellow},
-		{Dirt, false, tcell.ColorMaroon},
-		{Clay, false, tcell.ColorOlive},
-		{Rock, false, tcell.ColorGray},
-		{Sand, true, tcell.ColorBlack},
-	}
-
-	for _, tt := range tests {
-		cell := NewCell(tt.soil)
-		cell.IsTunnel = tt.isTunnel
-		if cell.GetColor() != tt.expected {
-			t.Errorf("GetColor() for soil %d, tunnel %v: expected %v", tt.soil, tt.isTunnel, tt.expected)
-		}
 	}
 }
 

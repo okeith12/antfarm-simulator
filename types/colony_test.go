@@ -2,17 +2,15 @@ package types
 
 import (
 	"testing"
-
-	"github.com/gdamore/tcell/v2"
 )
 
 func TestNewColony(t *testing.T) {
-	colony := NewColony("Red", 10, 20, tcell.ColorRed)
+	colony := NewColony("Red", 10, 20, ColonyRed)
 
 	if colony.Name != "Red" {
 		t.Errorf("Expected Name 'Red', got '%s'", colony.Name)
 	}
-	if colony.Color != tcell.ColorRed {
+	if colony.Color != ColonyRed {
 		t.Errorf("Expected Color Red, got %v", colony.Color)
 	}
 	if colony.Queen == nil {
@@ -30,7 +28,7 @@ func TestNewColony(t *testing.T) {
 }
 
 func TestGetAllAnts(t *testing.T) {
-	colony := NewColony("Red", 10, 20, tcell.ColorRed)
+	colony := NewColony("Red", 10, 20, ColonyRed)
 
 	// Initial: queen + head nurse
 	if len(colony.GetAllAnts()) != 2 {
@@ -45,7 +43,7 @@ func TestGetAllAnts(t *testing.T) {
 }
 
 func TestGetAntCount(t *testing.T) {
-	colony := NewColony("Red", 10, 20, tcell.ColorRed)
+	colony := NewColony("Red", 10, 20, ColonyRed)
 
 	if colony.GetAntCount() != 2 {
 		t.Errorf("Expected count 2, got %d", colony.GetAntCount())

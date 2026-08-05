@@ -1,15 +1,14 @@
 package logic
 
 import (
+	"antfarm/rng"
 	"antfarm/types"
 	"testing"
-
-	"github.com/gdamore/tcell/v2"
 )
 
 func TestAddColony(t *testing.T) {
-	world := types.NewWorld(40, 30)
-	colony := types.NewColony("Red", 20, 15, tcell.ColorRed)
+	world := types.NewWorld(40, 30, rng.New(1))
+	colony := types.NewColony("Red", 20, 15, types.ColonyRed)
 
 	AddColony(world, colony)
 
@@ -34,9 +33,9 @@ func TestAddColony(t *testing.T) {
 }
 
 func TestAddMultipleColonies(t *testing.T) {
-	world := types.NewWorld(80, 40)
-	colony1 := types.NewColony("Red", 20, 20, tcell.ColorRed)
-	colony2 := types.NewColony("Blue", 60, 20, tcell.ColorBlue)
+	world := types.NewWorld(80, 40, rng.New(1))
+	colony1 := types.NewColony("Red", 20, 20, types.ColonyRed)
+	colony2 := types.NewColony("Blue", 60, 20, types.ColonyBlue)
 
 	AddColony(world, colony1)
 	AddColony(world, colony2)
@@ -47,7 +46,7 @@ func TestAddMultipleColonies(t *testing.T) {
 }
 
 func TestPlaceAnt(t *testing.T) {
-	world := types.NewWorld(40, 30)
+	world := types.NewWorld(40, 30, rng.New(1))
 	world.Grid[10][10].IsTunnel = true
 
 	worker := types.NewWorker(1, 10, 10, "Red")
@@ -62,7 +61,7 @@ func TestPlaceAnt(t *testing.T) {
 }
 
 func TestPlaceAntFailsOnOccupied(t *testing.T) {
-	world := types.NewWorld(40, 30)
+	world := types.NewWorld(40, 30, rng.New(1))
 	world.Grid[10][10].IsTunnel = true
 
 	worker1 := types.NewWorker(1, 10, 10, "Red")
@@ -77,7 +76,7 @@ func TestPlaceAntFailsOnOccupied(t *testing.T) {
 }
 
 func TestPlaceAntFailsOnNonTunnel(t *testing.T) {
-	world := types.NewWorld(40, 30)
+	world := types.NewWorld(40, 30, rng.New(1))
 
 	worker := types.NewWorker(1, 10, 10, "Red")
 	success := PlaceAnt(world, worker)
@@ -88,7 +87,7 @@ func TestPlaceAntFailsOnNonTunnel(t *testing.T) {
 }
 
 func TestRemoveAnt(t *testing.T) {
-	world := types.NewWorld(40, 30)
+	world := types.NewWorld(40, 30, rng.New(1))
 	world.Grid[10][10].IsTunnel = true
 
 	worker := types.NewWorker(1, 10, 10, "Red")
@@ -102,7 +101,7 @@ func TestRemoveAnt(t *testing.T) {
 }
 
 func TestMoveAnt(t *testing.T) {
-	world := types.NewWorld(40, 30)
+	world := types.NewWorld(40, 30, rng.New(1))
 	world.Grid[10][10].IsTunnel = true
 	world.Grid[10][11].IsTunnel = true
 
@@ -126,7 +125,7 @@ func TestMoveAnt(t *testing.T) {
 }
 
 func TestMoveAntFailsOnInvalid(t *testing.T) {
-	world := types.NewWorld(40, 30)
+	world := types.NewWorld(40, 30, rng.New(1))
 	world.Grid[10][10].IsTunnel = true
 
 	worker := types.NewWorker(1, 10, 10, "Red")
@@ -140,7 +139,7 @@ func TestMoveAntFailsOnInvalid(t *testing.T) {
 }
 
 func TestMoveAntFailsOnOccupied(t *testing.T) {
-	world := types.NewWorld(40, 30)
+	world := types.NewWorld(40, 30, rng.New(1))
 	world.Grid[10][10].IsTunnel = true
 	world.Grid[10][11].IsTunnel = true
 

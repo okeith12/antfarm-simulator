@@ -1,6 +1,6 @@
 package types
 
-import "math/rand"
+import "antfarm/rng"
 
 // world.go - Defines the game world (the entire ant farm environment)
 // The world is a 2D grid of cells containing terrain, tunnels, and ants
@@ -13,11 +13,15 @@ type World struct {
 	Grid     [][]*Cell // 2D grid of cells
 	Colonies []*Colony // All ant colonies in this world
 	Ticks    int       // Number of updates that have occurred
+	Rng      *rng.Rng  // Deterministic random source for the whole simulation
 }
 
 // NewWorld creates a new world with procedurally generated terrain
 // The top rows are open air (surface), deeper layers have different soil types
-func NewWorld(width, height int) *World {
+//
+// The generator is injected rather than taken from the global pool so that a
+// given seed always reproduces the same world and colony.
+func NewWorld(width, height int, r *rng.Rng) *World {
 	grid := make([][]*Cell, height)
 
 	for y := 0; y < height; y++ {
@@ -39,7 +43,7 @@ func NewWorld(width, height int) *World {
 
 	// Scatter food on surface (top row)
 	for x := 0; x < width; x++ {
-		if rand.Float64() < 0.1 { // 10% chance of food
+		if r.Chance(10) { // 10% chance of food
 			grid[1][x].Food = 5 // Food pellet
 		}
 	}
@@ -50,6 +54,7 @@ func NewWorld(width, height int) *World {
 		Grid:     grid,
 		Colonies: []*Colony{},
 		Ticks:    0,
+		Rng:      r,
 	}
 }
 

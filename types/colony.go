@@ -1,15 +1,24 @@
 package types
 
-import "github.com/gdamore/tcell/v2"
-
 // colony.go - Defines ant colonies (collections of ants with shared resources)
 // Each colony has a queen, worker ants, food stores, and a unique color/identity
+
+// ColonyColor identifies a colony's palette slot. It is a plain enum so the
+// simulation stays render-agnostic; the display layer maps it to an actual color.
+type ColonyColor int
+
+const (
+	ColonyRed ColonyColor = iota
+	ColonyBlue
+	ColonyGreen
+	ColonyPurple
+)
 
 // Colony represents a group of ants that work together
 // Contains the queen, all ants, shared resources, and colony identity
 type Colony struct {
 	Name          string        // Colony identifier (e.g. "Red", "Black")
-	Color         tcell.Color   // Display color for this colony's ants
+	Color         ColonyColor   // Palette slot for this colony's ants
 	Queen         *QueenAnt     // The queen ant (center of the colony)
 	HeadNurse     *NurseAnt     // The primary nurse ant (second in command)
 	Nurses        []*NurseAnt   // All other nurse ants
@@ -24,7 +33,7 @@ type Colony struct {
 
 // NewColony creates a new ant colony with a queen and head nurse at the specified position
 // Starts with initial food and spawns the queen and head nurse as the first ants
-func NewColony(name string, queenX, queenY int, color tcell.Color) *Colony {
+func NewColony(name string, queenX, queenY int, color ColonyColor) *Colony {
 	queen := NewQueen(0, queenX, queenY, name)
 	headNurse := NewNurse(1, queenX+1, queenY, name) // Head nurse starts next to queen
 

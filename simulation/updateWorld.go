@@ -3,8 +3,6 @@ package logic
 import (
 	"antfarm/types"
 	"antfarm/util"
-
-	"math/rand"
 )
 
 // updateWorld.go - Main World simulation update logic
@@ -41,7 +39,7 @@ func updateColony(world *types.World, colony *types.Colony) {
 
 	// Queen lays 1-5 eggs periodically
 	if world.Ticks > 0 && world.Ticks%eggLayingInterval == 0 && colony.Food >= 10 {
-		eggsToLay := rand.Intn(5) + 1 // Random 1-5 eggs
+		eggsToLay := int(world.Rng.Below(5)) + 1 // Random 1-5 eggs
 
 		// Only lay as many eggs as we can afford
 		for i := 0; i < eggsToLay && colony.Food >= foodCost; i++ {
@@ -90,7 +88,7 @@ func updateColony(world *types.World, colony *types.Colony) {
 
 			// Determine what role this larvae becomes
 			// Rolls 1-100, then checks thresholds
-			newAnt := matureLarvaeToAnt(colony, larvae, rand.Intn(100))
+			newAnt := matureLarvaeToAnt(colony, larvae, int(world.Rng.Below(100)))
 
 			// Place worker in world
 			PlaceAnt(world, newAnt)

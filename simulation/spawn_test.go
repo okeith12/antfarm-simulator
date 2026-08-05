@@ -3,12 +3,10 @@ package logic
 import (
 	"antfarm/types"
 	"testing"
-
-	"github.com/gdamore/tcell/v2"
 )
 
 func TestSpawnWorker(t *testing.T) {
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 	initialID := colony.NextAntID
 
 	worker := SpawnWorker(colony, 15, 15)
@@ -28,7 +26,7 @@ func TestSpawnWorker(t *testing.T) {
 }
 
 func TestSpawnWorkerWithID(t *testing.T) {
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 	initialNextID := colony.NextAntID
 
 	worker := SpawnWorkerWithID(colony, 999, 15, 15)
@@ -42,7 +40,7 @@ func TestSpawnWorkerWithID(t *testing.T) {
 }
 
 func TestSpawnSoldier(t *testing.T) {
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 	initialID := colony.NextAntID
 
 	soldier := SpawnSoldier(colony, 12, 12)
@@ -59,7 +57,7 @@ func TestSpawnSoldier(t *testing.T) {
 }
 
 func TestSpawnSoliderWithID(t *testing.T) {
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 	initialNextID := colony.NextAntID
 
 	soldier := SpawnSoldierWithID(colony, 999, 15, 15)
@@ -73,7 +71,7 @@ func TestSpawnSoliderWithID(t *testing.T) {
 }
 
 func TestSpawnNurse(t *testing.T) {
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 	initialID := colony.NextAntID
 
 	nurse := SpawnNurse(colony, 11, 11)
@@ -89,7 +87,7 @@ func TestSpawnNurse(t *testing.T) {
 	}
 }
 func TestNurseWithID(t *testing.T) {
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 	initialNextID := colony.NextAntID
 
 	nurse := SpawnNurseWithID(colony, 999, 15, 15)
@@ -103,7 +101,7 @@ func TestNurseWithID(t *testing.T) {
 }
 
 func TestSpawnLarvae(t *testing.T) {
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 	initialID := colony.NextAntID
 
 	larvae := SpawnLarvae(colony, 10, 11)
@@ -120,7 +118,7 @@ func TestSpawnLarvae(t *testing.T) {
 }
 
 func TestRemoveLarvae(t *testing.T) {
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 
 	larvae1 := SpawnLarvae(colony, 10, 11)
 	larvae2 := SpawnLarvae(colony, 10, 12)

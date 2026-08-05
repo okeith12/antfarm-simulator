@@ -1,10 +1,9 @@
 package pathfinder
 
 import (
+	"antfarm/rng"
 	"antfarm/types"
 	"testing"
-
-	"github.com/gdamore/tcell/v2"
 )
 
 func TestNewWorkerPathfinder(t *testing.T) {
@@ -15,7 +14,7 @@ func TestNewWorkerPathfinder(t *testing.T) {
 }
 
 func TestWorkerMoveRandomly(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	wp := NewWorkerPathfinder()
 
 	worker := types.NewWorker(1, 10, 1, "Red")
@@ -28,10 +27,10 @@ func TestWorkerMoveRandomly(t *testing.T) {
 }
 
 func TestWorkerBringFoodToQueen(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	wp := NewWorkerPathfinder()
 
-	colony := types.NewColony("Red", 10, 10, tcell.ColorRed)
+	colony := types.NewColony("Red", 10, 10, types.ColonyRed)
 
 	// Create tunnel path
 	for x := 8; x <= 12; x++ {
@@ -67,7 +66,7 @@ func TestWorkerIsAdjacentToTarget(t *testing.T) {
 }
 
 func TestWorkerMoveTowardTarget(t *testing.T) {
-	world := types.NewWorld(20, 20)
+	world := types.NewWorld(20, 20, rng.New(1))
 	wp := NewWorkerPathfinder()
 
 	// Create tunnel path

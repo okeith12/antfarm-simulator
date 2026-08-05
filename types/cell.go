@@ -1,7 +1,5 @@
 package types
 
-import "github.com/gdamore/tcell/v2"
-
 // cell.go - Defines the basic unit of the world grid
 // Each cell represents a single position in the 2D ant farm world and contains
 // information about terrain type, whether it's been dug into a tunnel, and what occupies it
@@ -38,26 +36,6 @@ func NewCell(soil Soil) *Cell {
 		Food:     0,
 		// Moisture:  50,
 		// Stability: 100,
-	}
-}
-
-// GetColor returns the display color for this cell
-func (c *Cell) GetColor() tcell.Color {
-	if c.IsTunnel {
-		return tcell.ColorBlack
-	}
-
-	switch c.Soil {
-	case Sand:
-		return tcell.ColorYellow
-	case Dirt:
-		return tcell.ColorMaroon
-	case Clay:
-		return tcell.ColorOlive
-	case Rock:
-		return tcell.ColorGray
-	default:
-		return tcell.ColorBlack
 	}
 }
 
